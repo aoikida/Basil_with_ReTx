@@ -1,9 +1,7 @@
 // -*- mode: c++; c-file-style: "k&r"; c-basic-offset: 4 -*-
 /***********************************************************************
  *
- * store/indicus/shardclient.h:
- *   Single shard indicus transactional client interface.
- *
+ * Copyright 2024 Aoi Kida
  * Copyright 2021 Florian Suri-Payer <fsp@cs.cornell.edu>
  *                Matthew Burke <matthelb@cs.cornell.edu>
  *
