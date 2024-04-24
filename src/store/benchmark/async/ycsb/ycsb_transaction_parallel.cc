@@ -1,7 +1,6 @@
 /***********************************************************************
  *
- * Copyright 2021 Florian Suri-Payer <fsp@cs.cornell.edu>
- *                Matthew Burke <matthelb@cs.cornell.edu>
+ * Copyright 2024 Aoi Kida
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,9 +26,6 @@
 #include "store/benchmark/async/ycsb/ycsb_transaction.h"
 
 namespace ycsb {
-
-//同じデータ量のリクエストを送信しないとバグるので、キーのデータ量を同じにすべく、キーの桁数は全て同じにする。
-//100個のキーを作成しても、使用するキーは10~99までの90個となる。
 
 YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps,
     std::mt19937 &rand) : keySelector(keySelector), numOps(numOps) {
