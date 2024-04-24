@@ -418,9 +418,9 @@ typedef struct Parameters {
     bool all_to_all_fb,
     bool no_fallback,
     uint64_t relayP1_timeout,
-    bool replicaGossip, 
-    bool batchOptimization, uint64_t batchSize, 
-    uint64_t numOps, uint64_t numKeys, double zipfCoefficient, 
+    bool replicaGossip,
+    bool batchOptimization, uint64_t batchSize,
+    uint64_t numOps, uint64_t numKeys, double zipfCoefficient,
     bool signatureBatch) :
     signedMessages(signedMessages), validateProofs(validateProofs),
     hashDigest(hashDigest), verifyDeps(verifyDeps), signatureBatchSize(signatureBatchSize),
@@ -439,8 +439,8 @@ typedef struct Parameters {
     no_fallback(no_fallback),
     relayP1_timeout(relayP1_timeout),
     replicaGossip(replicaGossip),
-    batchOptimization(batchOptimization), batchSize(batchSize), 
-    numOps(numOps), numKeys(numKeys), zipfCoefficient(zipfCoefficient), 
+    batchOptimization(batchOptimization), batchSize(batchSize),
+    numOps(numOps), numKeys(numKeys), zipfCoefficient(zipfCoefficient),
     signatureBatch(signatureBatch){ }
 } Parameters;
 
