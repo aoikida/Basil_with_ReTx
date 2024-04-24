@@ -1,9 +1,7 @@
 // -*- mode: c++; c-file-style: "k&r"; c-basic-offset: 4 -*-
 /***********************************************************************
  *
- * benchmark.cpp:
- *   simple replication benchmark client
- *
+ * Copyright 2024 Aoi Kida
  * Copyright 2013 Dan R. K. Ports  <drkp@cs.washington.edu>
  *
  * Permission is hereby granted, free of charge, to any person

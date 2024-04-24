@@ -14,8 +14,6 @@
 
 using namespace std;
 
-//このファイル多分あつい
-
 // Function to pick a random key according to some distribution.
 int rand_key();
 

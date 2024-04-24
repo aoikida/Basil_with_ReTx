@@ -1,5 +1,5 @@
 /***********************************************************************
- *
+ * Copyright 2024 AoiKida
  * Copyright 2021 Florian Suri-Payer <fsp@cs.cornell.edu>
  *                Matthew Burke <matthelb@cs.cornell.edu>
  *
@@ -39,12 +39,10 @@ void AsyncAdapterClient::Execute(AsyncTransaction *txn,
   currTxn = txn;
   outstandingOpCount = 0UL;
   finishedOpCount = 0UL;
-  readValues.clear(); //readVaulesの初期化
-  //indicusstoreのclient.ccのbeginに通じている。
+  readValues.clear();
   client->Begin([this](uint64_t id) {
     ExecuteNextOperation();
   }, []{}, timeout, retry);
-  //ExecuteNextOperationで次のオペレーションを指定している。
 }
 
 void AsyncAdapterClient::Execute_ycsb(AsyncTransaction *txn,
@@ -81,7 +79,7 @@ void AsyncAdapterClient::MakeTransaction_no_abort(uint64_t txNum, uint64_t txSiz
   //旋回のバッチで使用した変数を初期化
   transaction.clear();
   keyTxMap.clear(); //get_batchにおいて、keyからtxのidを割り出すために使用
-  read_set.clear(); 
+  read_set.clear();
   readOpNum = 0;
   write_set.clear();
   writeOpNum = 0;
@@ -558,7 +556,7 @@ void AsyncAdapterClient::MakeTransaction_multi_abort(uint64_t txNum, uint64_t tx
   batch_size = batchSize;
   
 
-  //旋回のバッチで使用した変数を初期化
+  //前回のバッチで使用した変数を初期化
   transaction.clear();
   keyTxMap.clear(); //get_batchにおいて、keyからtxのidを割り出すために使用
   read_set.clear(); 

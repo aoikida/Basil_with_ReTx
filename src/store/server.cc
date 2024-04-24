@@ -1,9 +1,7 @@
 // -*- mode: c++; c-file-style: "k&r"; c-basic-offset: 4 -*-
 /***********************************************************************
  *
- * store/tapirstore/server.cc:
- *   Implementation of a single transactional key-value server.
- *
+ * Copyright 2024 AoiKida
  * Copyright 2015 Irene Zhang <iyzhang@cs.washington.edu>
  *                Naveen Kr. Sharma <naveenks@cs.washington.edu>
  *
