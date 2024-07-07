@@ -14,6 +14,7 @@ NUM_KEYS_IN_DB=1000000 #データベース内のレコードの数
 KEY_PATH="/usr/local/etc/indicus-keys/donna" #keyのパス
 BENCHMARK="rw" #rwとretwis以外使用できない #smallbankとtpcc-syncは同期環境を想定しているので工夫が必要かも
 BATCH_SIZE=1
+READ_RATIO=90
 
 
 
@@ -47,7 +48,7 @@ for i in `seq 0 $((CLIENTS-1))`; do
     --protocol_mode $PROTOCOL --num_keys $NUM_KEYS_IN_DB --benchmark $BENCHMARK --num_ops $NUM_OPS_TX \
     --exp_duration $DURATION --client_id $i --num_clients $CLIENT_THREAD --warmup_secs 0 --cooldown_secs 0 \
     --key_selector zipf --zipf_coefficient $ZIPF --stats_file "stats-0.json" --indicus_key_path $KEY_PATH \
-    --indicus_batch_size $BATCH_SIZE  &> client-0.out &
+    --indicus_batch_size $BATCH_SIZE  --read_ratio $READ_RATIO &> client0.out &
 done;
 
 sleep $((DURATION+3))

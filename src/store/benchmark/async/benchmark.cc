@@ -506,7 +506,7 @@ DEFINE_bool(rw_read_only, false, "only do read operations");
 /**
  * YCSB settings.
  */
-DEFINE_int32(read_ratio, 50, "percentage of read transactions (for ycsb)");
+DEFINE_int32(read_ratio, 0, "percentage of read transactions (for ycsb)");
 /**
  * TPCC settings.
  */
