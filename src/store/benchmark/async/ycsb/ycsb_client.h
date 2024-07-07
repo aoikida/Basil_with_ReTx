@@ -40,11 +40,11 @@ enum KeySelection {
 
 class YCSBClient : public AsyncTransactionBenchClient {
  public:
-  YCSBClient(KeySelector *keySelector, uint64_t numOps, bool readOnly, AsyncClient &client,
+  YCSBClient(KeySelector *keySelector, uint64_t numKeys, bool readOnly, AsyncClient &client,
       Transport &transport, uint64_t id, int numRequests, int expDuration,
       uint64_t delay, int warmupSec, int cooldownSec, int tputInterval,
       uint32_t abortBackoff, bool retryAborted, uint32_t maxBackoff, uint32_t maxAttempts,
-      int32_t batchSize, int32_t readRatio, uint64_t numKeys, const std::string &latencyFilename = "");
+      int32_t batchSize, int32_t readRatio, const std::string &latencyFilename = "");
 
 
   virtual ~YCSBClient();
@@ -57,11 +57,8 @@ class YCSBClient : public AsyncTransactionBenchClient {
 
  private:
   KeySelector *keySelector;
-  uint64_t numOps;
   uint64_t numKeys;
   uint64_t tid = 0;
-  bool readOnly;
-  int32_t batchSize;
   int32_t readRatio;
 
 };

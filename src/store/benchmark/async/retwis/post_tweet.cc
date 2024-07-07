@@ -55,11 +55,9 @@ Operation PostTweet::GetNextOperation(size_t outstandingOpCount, size_t finished
     return Wait();
   }
 }
-
-Operation PostTweet::GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf){}
+/*
 
 Operation PostTweet::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {}
-
+*/
 } // namespace retwis

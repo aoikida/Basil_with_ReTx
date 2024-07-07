@@ -381,15 +381,6 @@ void ShardClient::Put(uint64_t id, const std::string &key,
   pcb(REPLY_OK, key, value);
 }
 
-void ShardClient::Put_ycsb(uint64_t id, const std::string &key,
-      const std::string &value, put_callback_ycsb pcby, put_timeout_callback ptcb, Xoroshiro128Plus &rnd, FastZipf &zipf,
-      uint32_t timeout) {
-  WriteMessage *writeMsg = txn.add_write_set();
-  writeMsg->set_key(key);
-  writeMsg->set_value(value);
-  pcby(REPLY_OK, key, value, rnd, zipf);
-}
-
 void ShardClient::Phase1(uint64_t id, const proto::Transaction &transaction, const std::string &txnDigest,
   phase1_callback pcb, phase1_timeout_callback ptcb, relayP1_callback rcb, finishConflictCB fcb, uint32_t timeout) {
   Debug("[group %i] Sending PHASE1 [%lu]", group, id);
@@ -1035,24 +1026,6 @@ void ShardClient::GetTimeout(uint64_t reqId) {
     gtc(REPLY_TIMEOUT, key);
   }
 }
-
-/*
-void ShardClient::GetTimeout_batch(uint64_t reqId) {
-  auto itr = this->pendingGets.find(reqId);
-  if (itr != this->pendingGets.end()) {
-    PendingQuorumGet *pendingGet = itr->second;
-    get_timeout_callback_batch gtcb = pendingGet->gtcb;
-    std::string key = pendingGet->key;
-    this->pendingGets.erase(itr);
-    delete pendingGet;
-    gtcb(REPLY_TIMEOUT, key, );
-  }
-}
-*/
-
-
-
-
 
 //TODO: pass in reply as GetUnused. Free it at the end.
 void ShardClient::HandleReadReplyMulti(proto::ReadReply* reply) {

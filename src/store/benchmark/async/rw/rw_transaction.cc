@@ -84,9 +84,7 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
     return Wait();
   }
 }
-
-Operation RWTransaction::GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf){}
+/*
 
 Operation RWTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {
@@ -125,6 +123,7 @@ Operation RWTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_
     return Wait();
   }
 }
+*/
 /*
 Operation RWTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues, int batchSize) {

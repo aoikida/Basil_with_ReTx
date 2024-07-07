@@ -37,17 +37,19 @@ namespace ycsb {
 
 class YCSBTransaction : public AsyncTransaction {
  public:
-  YCSBTransaction(KeySelector *keySelector, int numOps, bool readOnly, int batchSize, int readRatio, int numKeys, std::mt19937 &rand);
+  YCSBTransaction(KeySelector *keySelector, int numOps, int readRatio, std::mt19937 &rand);
   virtual ~YCSBTransaction();
 
   virtual Operation GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues);
 
+  /*
   virtual Operation GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf);
   
   virtual Operation GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf);
+  */
 
   inline const std::vector<int> getKeyIdxs() const {
     return keyIdxs;
@@ -63,9 +65,9 @@ class YCSBTransaction : public AsyncTransaction {
 
  private:
   const size_t numOps;
-  const size_t numKeys;
-  const bool readOnly;
-  const size_t batchSize;
+  //const size_t numKeys;
+  //const bool readOnly;
+  //const size_t batchSize;
   const size_t readRatio;
   std::vector<int> keyIdxs;
   std::vector<Operation> read_set;

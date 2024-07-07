@@ -69,7 +69,6 @@ BenchmarkClient::~BenchmarkClient() {
 
 void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization, bool benchmark) {
   Debug("BenchmarkClient::Start\n");
-  ycsb = benchmark;
 	n = 0;
   curr_bdcb = bdcb;
   transport.Timer(warmupSec * 1000, std::bind(&BenchmarkClient::WarmupDone,
@@ -86,9 +85,6 @@ void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization, bo
   //この行き先は、async_transaction_bench_client
   if (batchOptimization){
     SendNext_batch();
-  }
-  else if (ycsb){
-    SendNext_ycsb();
   }
   else{
     SendNext();
@@ -162,29 +158,17 @@ void BenchmarkClient::OnReply(int result) {
   Debug("BenchmarkClient::OnReply");
   IncrementSent(result);
 
-  ycsb = 1;
-
   if (done) {
     return;
   }
 
   if (delay == 0) { 
     Latency_Start(&latency);
-    if (ycsb){
-      SendNext_ycsb();
-    }
-    else{
-      SendNext();
-    }
+    SendNext();
     
   } else {
     uint64_t rdelay = rand() % delay*2;
-    if (ycsb){
-      transport.Timer(rdelay, std::bind(&BenchmarkClient::SendNext_ycsb, this));
-    }
-    else{
-      transport.Timer(rdelay, std::bind(&BenchmarkClient::SendNext, this));
-    }
+    transport.Timer(rdelay, std::bind(&BenchmarkClient::SendNext, this));
   }
 }
 

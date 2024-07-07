@@ -28,9 +28,9 @@
 
 namespace ycsb {
 
-YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps, bool readOnly, int batchSize, int readRatio, int numKeys, 
-std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readOnly(readOnly), batchSize(batchSize), readRatio(readRatio), numKeys(numKeys){
-  for (int i = 0; i < numOps * batchSize; ++i) {
+YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps, int readRatio, 
+std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readRatio(readRatio){
+  for (int i = 0; i < numOps; ++i) {
     uint64_t key = keySelector->GetKey(rand);
     keyIdxs.push_back(key);
   }
@@ -40,7 +40,55 @@ YCSBTransaction::~YCSBTransaction() {
 }
 
 Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues) {}
+    std::map<std::string, std::string> readValues) {
+  if (finishedOpCount < GetNumOps()) {
+    std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
+    if (finishedOpCount != outstandingOpCount) {
+      return Wait();
+    }
+    else if ((rand() % 100) < readRatio) {
+      std::string key = keySelector->GetKey(finishedOpCount);
+      std::cerr << "read: " << key << std::endl;
+      return Get(key);
+    } 
+    else {
+        std::string key = keySelector->GetKey(finishedOpCount);
+        std::cerr << "write: " << key << std::endl;
+        auto strValueItr = readValues.find(key);
+
+        std::string strValue;
+        if (strValueItr != readValues.end()) {
+            strValue = strValueItr->second;
+        } else {
+            strValue = "";
+        }
+
+        std::string writeValue;
+        if (strValue.length() == 0) {
+            writeValue = std::string(100, '\0'); // make a longer string
+        } else {
+            uint64_t intValue = 0;
+            for (int i = 0; i < 100; ++i) {
+                intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
+            }
+            intValue++;
+            for (int i = 0; i < 100; ++i) {
+                writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
+            }
+        }
+        return Put(key, writeValue);
+    }
+  }
+  else if (finishedOpCount == GetNumOps()) {
+    std::cerr << "commit" << std::endl;
+    return Commit();
+  }
+  else {
+    return Wait();
+  }
+}
+
+/*
 
 Operation YCSBTransaction::GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf) {
@@ -83,5 +131,6 @@ Operation YCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount, siz
     std::cerr << "unnecessary transaction is made" << std::endl;
   }
 }
+*/
 
 } // namespace ycsb

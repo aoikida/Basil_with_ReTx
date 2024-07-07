@@ -45,30 +45,19 @@ void AsyncAdapterClient::Execute(AsyncTransaction *txn,
   }, []{}, timeout, retry);
 }
 
-void AsyncAdapterClient::Execute_ycsb(AsyncTransaction *txn,
-    execute_callback ecb, bool retry) {
-  currEcb = ecb;
-  currTxn = txn;
-  outstandingOpCount = 0UL;
-  finishedOpCount = 0UL;
-  readValues.clear(); //readVaulesの初期化
-  //indicusstoreのclient.ccのbeginに通じている。
-  client->Begin_ycsb([this](uint64_t id, Xoroshiro128Plus &rnd, FastZipf &zipf) {
-    ExecuteNextOperation_ycsb(rnd, zipf);
-  }, []{}, timeout, retry);
-  //ExecuteNextOperationで次のオペレーションを指定している。
-}
-
+//これももう使わないのではないか？
 void AsyncAdapterClient::Execute_batch(AsyncTransaction *txn,
     execute_big_callback ecb, bool retry) {
   currEcbcb = ecb;
   currTxn = txn;
   readValues.clear();
   client->Begin_batch([this](uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums) {
-    ExecuteNextOperation_ex(txSize, batchSize, rnd, zipf);
+    //元々ExecuteNextOperation_ex()になっていたが、ExecuteNextOperation()に変更
+    ExecuteNextOperation();
   }, []{}, timeout, retry);
 }
 
+/*
 void AsyncAdapterClient::MakeTransaction_no_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums){
 
   int tx_num = 0;
@@ -190,7 +179,9 @@ void AsyncAdapterClient::MakeTransaction_no_abort(uint64_t txNum, uint64_t txSiz
     ExecuteReadOperation();
   }
 }
+*/
 
+/*
 void AsyncAdapterClient::MakeTransaction_single_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums){
 
   int tx_num = 0;
@@ -362,12 +353,12 @@ void AsyncAdapterClient::MakeTransaction_single_abort(uint64_t txNum, uint64_t t
         thisTxWrite++;
       }
 
-      /*
+      //コメントアウト
       if (thisTxWrite != 0){
         ExecuteWriteOperation(tx_num, pre_write_set);
         thisTxWrite == 0;
       }
-      */
+      
 
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
 
@@ -498,12 +489,12 @@ void AsyncAdapterClient::MakeTransaction_single_abort(uint64_t txNum, uint64_t t
         thisTxWrite++;
       }
 
-      /*
+      //コメントアウト
       if (thisTxWrite != 0){
         ExecuteWriteOperation(tx_num, pre_write_set);
         thisTxWrite == 0;
       }
-      */
+      
 
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
 
@@ -542,7 +533,9 @@ MAKE_TX_FIN:
     writeread = false;
   }
 }
+*/
 
+/*
 void AsyncAdapterClient::MakeTransaction_multi_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums){
 
   int tx_num = 0;
@@ -773,12 +766,12 @@ void AsyncAdapterClient::MakeTransaction_multi_abort(uint64_t txNum, uint64_t tx
         thisTxWrite++;
       }
 
-      /*
+      //コメントアウト
       if (thisTxWrite != 0){
         ExecuteWriteOperation(tx_num, pre_write_set);
         thisTxWrite == 0;
       }
-      */
+      
 
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
 
@@ -813,54 +806,7 @@ void AsyncAdapterClient::MakeTransaction_multi_abort(uint64_t txNum, uint64_t tx
   }
 
 }
-
-void AsyncAdapterClient::ExecuteNextOperation_ex(uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {
-  Debug("AsyncAdapterClient::ExecuteNextOperation");
-  //GetNextOperationはstore/benchmark/async/rw/rw_transaction.ccのGetNextOperationである。
-  int tx_num = 0;
-  while(tx_num < batchSize){
-    Debug("tx_num: %d\n", tx_num);
-    for (int op_num = 0; op_num < txSize; op_num++){
-      Operation op = currTxn->GetNextOperation_ycsb(outstandingOpCount, finishedOpCount,
-              readValues, batchSize, rnd, zipf);
-      switch (op.type) {
-        case GET: {
-          client->Get(op->key, std::bind(&AsyncAdapterClient::GetCallback_ycsb, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-            std::placeholders::_4), std::bind(&AsyncAdapterClient::GetTimeout, this,
-              std::placeholders::_1, std::placeholders::_2), timeout);
-          // timeout doesn't really matter?
-          ++outstandingOpCount;
-          ExecuteNextOperation_ex(txSize, batchSize, rnd, zipf);
-          break;
-        }
-        case PUT: {
-              client->Put(op->key, op->value, std::bind(&AsyncAdapterClient::PutCallback_ycsb,
-                this, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3), std::bind(&AsyncAdapterClient::PutTimeout,
-                  this, std::placeholders::_1, std::placeholders::_2,
-                  std::placeholders::_3), timeout);
-          // timeout doesn't really matter?
-          ++outstandingOpCount;
-          ExecuteNextOperation_ex(txSize, batchSize, rnd, zipf);
-          break;
-        }
-        case WAIT: {
-          break;
-        }
-        default:
-          NOT_REACHABLE();
-      }
-    }
-    tx_num++;
-  }
-  client->Commit(std::bind(&AsyncAdapterClient::CommitBigCallback, this,
-        std::placeholders::_1), std::bind(&AsyncAdapterClient::CommitTimeout,
-          this), timeout);
-}
-
-
-
+*/
 
 void AsyncAdapterClient::ExecuteWriteOperation(){
 
@@ -901,8 +847,7 @@ void AsyncAdapterClient::ExecuteCommit(){
 void AsyncAdapterClient::ExecuteNextOperation() {
   Debug("AsyncAdapterClient::ExecuteNextOperation");
   //GetNextOperationはstore/benchmark/async/rw/rw_transaction.ccのGetNextOperationである。
-  Operation op = currTxn->GetNextOperation(outstandingOpCount, finishedOpCount,
-      readValues);
+  Operation op = currTxn->GetNextOperation(outstandingOpCount, finishedOpCount, readValues);
   switch (op.type) {
     case GET: {
       client->Get(op.key, std::bind(&AsyncAdapterClient::GetCallback, this,
@@ -947,69 +892,12 @@ void AsyncAdapterClient::ExecuteNextOperation() {
   }
 }
 
-void AsyncAdapterClient::ExecuteNextOperation_ycsb(Xoroshiro128Plus &rnd, FastZipf &zipf) {
-  Debug("AsyncAdapterClient::ExecuteNextOperation");
-  //GetNextOperationはstore/benchmark/async/rw/rw_transaction.ccのGetNextOperationである。
-  Operation op = currTxn->GetNextOperation_ycsb(outstandingOpCount, finishedOpCount,
-      readValues, rnd, zipf);
-  switch (op.type) {
-    case GET: {
-      client->Get_ycsb(op.key, std::bind(&AsyncAdapterClient::GetCallback_ycsb, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-        std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::bind(&AsyncAdapterClient::GetTimeout, this,
-          std::placeholders::_1, std::placeholders::_2), timeout);
-      ++outstandingOpCount;
-      // timeout doesn't really matter?
-      ExecuteNextOperation_ycsb(rnd, zipf);
-      break;
-    }
-    case PUT: {
-      client->Put_ycsb(op.key, op.value, std::bind(&AsyncAdapterClient::PutCallback_ycsb,
-            this, std::placeholders::_1, std::placeholders::_2,
-            std::placeholders::_3, std::placeholders::_4, std::placeholders::_5), std::bind(&AsyncAdapterClient::PutTimeout,
-              this, std::placeholders::_1, std::placeholders::_2,
-              std::placeholders::_3), timeout);
-      ++outstandingOpCount;
-      // timeout doesn't really matter?
-      ExecuteNextOperation_ycsb(rnd, zipf);
-      break;
-    }
-    case COMMIT: {
-      client->Commit(std::bind(&AsyncAdapterClient::CommitCallback, this,
-        std::placeholders::_1), std::bind(&AsyncAdapterClient::CommitTimeout,
-          this), timeout);
-      // timeout doesn't really matter?
-      break;
-    }
-    case ABORT: {
-      client->Abort(std::bind(&AsyncAdapterClient::AbortCallback, this),
-          std::bind(&AsyncAdapterClient::AbortTimeout, this), timeout);
-      // timeout doesn't really matter?
-      currEcb(ABORTED_USER, std::map<std::string, std::string>());
-      break;
-    }
-    case WAIT: {
-      break;
-    }
-    default:
-      NOT_REACHABLE();
-  }
-}
-
 void AsyncAdapterClient::GetCallback(int status, const std::string &key,
     const std::string &val, Timestamp ts) {
   Debug("Get(%s) callback.", key.c_str());
   readValues.insert(std::make_pair(key, val));
   finishedOpCount++;
   ExecuteNextOperation();
-}
-
-void AsyncAdapterClient::GetCallback_ycsb(int status, const std::string &key,
-    const std::string &val, Timestamp ts, Xoroshiro128Plus &rnd, FastZipf &zipf) {
-  Debug("Get(%s) callback.", key.c_str());
-  readValues.insert(std::make_pair(key, val));
-  finishedOpCount++;
-  ExecuteNextOperation_ex(txSize, batchSize, rnd, zipf);
 }
 
 
@@ -1037,32 +925,11 @@ void AsyncAdapterClient::GetTimeout(int status, const std::string &key) {
           std::placeholders::_1, std::placeholders::_2), timeout);
 }
 
-void AsyncAdapterClient::GetTimeout_ycsb(int status, const std::string &key) {
-  Warning("Get(%s) timed out :(", key.c_str());
-  client->Get_ycsb(key, std::bind(&AsyncAdapterClient::GetCallback_ycsb, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-        std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::bind(&AsyncAdapterClient::GetTimeout, this,
-          std::placeholders::_1, std::placeholders::_2), timeout);
-}
-
-void AsyncAdapterClient::GetTimeout_batch(int status, std::vector<std::string> key_list, std::vector<get_callback> gcb_list, uint32_t timeout) {
-  Warning("Get_batch timed out");
-  client->Get_batch(key_list, gcb_list, &keyTxMap, std::bind(&AsyncAdapterClient::GetTimeout_batch, this,
-          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), timeout);
-}
-
 void AsyncAdapterClient::PutCallback(int status, const std::string &key,
     const std::string &val) {
   Debug("Put(%s,%s) callback.", key.c_str(), val.c_str());
   finishedOpCount++;
   ExecuteNextOperation();
-}
-
-void AsyncAdapterClient::PutCallback_ycsb(int status, const std::string &key,
-    const std::string &val, Xoroshiro128Plus &rnd, FastZipf &zipf) {
-  Debug("Put(%s,%s) callback.", key.c_str(), val.c_str());
-  finishedOpCount++;
-  ExecuteNextOperation_ex(txSize, batchSize, rnd, zipf);
 }
 
 void AsyncAdapterClient::PutCallback_batch(int status, const std::string &key,
@@ -1095,20 +962,6 @@ void AsyncAdapterClient::CommitBigCallback(transaction_status_t result) {
   Debug("Commit callback.");
   //ここを変える
   currEcbcb(result, readValues, batch_size, abort_set.size());
-}
-
-void AsyncAdapterClient::CommitCallback_batch(transaction_status_t result, int txId) {
-  Debug("Commit callback_batch \n");
-  commitCbCount++;
-  if (result == COMMITTED){
-    batch.erase(txId);
-  }
-  results.push_back(result);
-  if (commitTxNum <= commitCbCount){
-      currEcbb(results, readValues);
-      commitCbCount = 0;
-      results.clear();
-  }
 }
 
 void AsyncAdapterClient::CommitTimeout() {

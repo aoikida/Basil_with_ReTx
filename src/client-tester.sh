@@ -1,18 +1,18 @@
 #!/bin/bash
 
 CLIENTS=1 #クライアントプロセスの数 
-CLIENT_THREAD=12 #クライアントの中のスレッドの数
+CLIENT_THREAD=1 #クライアントの中のスレッドの数
 F=0 #Fault nodeの数??
 NUM_GROUPS=1 #シャードの数
-CONFIG="shard-r6.config" #設定ファイルは"shard-r1.config"
+CONFIG="shard-r0.config" #設定ファイルは"shard-r1.config"
 PROTOCOL="indicus" #プロトコルは"indicus(Basilのこと)""
 STORE=PROTOCOL+"store" #store = "indicusstore"
-DURATION=30 #実行時間は10秒
+DURATION=5 #実行時間は10秒
 ZIPF=0.0 #skew= 0
-NUM_OPS_TX=10 #トランザクション内のオペレーション数
+NUM_OPS_TX=2 #トランザクション内のオペレーション数
 NUM_KEYS_IN_DB=1000000 #データベース内のレコードの数
 KEY_PATH="/usr/local/etc/indicus-keys/donna" #keyのパス
-BENCHMARK="ycsb" #rwとretwis以外使用できない #smallbankとtpcc-syncは同期環境を想定しているので工夫が必要かも
+BENCHMARK="rw" #rwとretwis以外使用できない #smallbankとtpcc-syncは同期環境を想定しているので工夫が必要かも
 BATCH_SIZE=1
 
 
@@ -42,13 +42,12 @@ echo '[1] Starting new clients'
 for i in `seq 0 $((CLIENTS-1))`; do
   echo $i
   #valgrind
-  #DEBUG=store/indicusstore/*
-   store/benchmark/async/benchmark --config_path $CONFIG --num_groups $NUM_GROUPS \
+  DEBUG=store/indicusstore/* store/benchmark/async/benchmark --config_path $CONFIG --num_groups $NUM_GROUPS \
     --num_shards $NUM_GROUPS \
     --protocol_mode $PROTOCOL --num_keys $NUM_KEYS_IN_DB --benchmark $BENCHMARK --num_ops $NUM_OPS_TX \
     --exp_duration $DURATION --client_id $i --num_clients $CLIENT_THREAD --warmup_secs 0 --cooldown_secs 0 \
     --key_selector zipf --zipf_coefficient $ZIPF --stats_file "stats-0.json" --indicus_key_path $KEY_PATH \
-    --indicus_batch_size $BATCH_SIZE  &> client-9.out &
+    --indicus_batch_size $BATCH_SIZE  &> client-0.out &
 done;
 
 sleep $((DURATION+3))

@@ -65,7 +65,6 @@ AsyncTransaction *RetwisClient::GetNextTransaction() {
     return new GetTimeline(keySelector, GetRand());
   }
 }
-AsyncTransaction *RetwisClient::GetNextTransaction_ycsb() {}
 AsyncTransaction *RetwisClient::GetNextTransaction_batch() {}
 
 std::string RetwisClient::GetLastOp() const {

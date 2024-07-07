@@ -112,9 +112,8 @@ Client::~Client()
   delete verifier;
 }
 
-/* Begins a transaction. All subsequent operations before a commit() or
- * abort() are part of this transaction.
- */
+
+//普通のBegin
 void Client::Begin(begin_callback bcb, begin_timeout_callback btcb,
       uint32_t timeout, bool retry) {
   // fail the current txn iff failuer timer is up and
@@ -157,52 +156,6 @@ void Client::Begin(begin_callback bcb, begin_timeout_callback btcb,
     txn.mutable_timestamp()->set_id(client_id);
     //ここでExecuteNextOperationを実行してるみたい
     bcb(client_seq_num);
-  });
-}
-
-void Client::Begin_ycsb(begin_callback_ycsb bcby, begin_timeout_callback btcb,
-      uint32_t timeout, bool retry) {
-  // fail the current txn iff failuer timer is up and
-  // the number of txn is a multiple of frequency
-  // only fail fresh transactions
-  Debug("Begin_ycsb");
-  if(!retry) {
-    faulty_counter++;
-    failureActive = failureEnabled &&
-      (faulty_counter % params.injectFailure.frequency == 0);
-    for (auto b : bclient) {
-      b->SetFailureFlag(failureActive);
-    }
-    if(failureActive) stats.Increment("failure_attempts", 1);
-    if(failureEnabled) stats.Increment("total_fresh_tx_byz", 1);
-    if(!failureEnabled) stats.Increment("total_fresh_tx_honest", 1);
-
-  }
-
-  transport->Timer(0, [this, bcby, btcb, timeout]() {
-    if (pingReplicas) {
-      if (!first && !startedPings) {
-        startedPings = true;
-        for (auto sclient : bclient) {
-          sclient->StartPings();
-        }
-      }
-      first = false;
-    }
-
-    Latency_Start(&executeLatency);
-    client_seq_num++;
-    //std::cerr<< "BEGIN TX with client_seq_num: " << client_seq_num << std::endl;
-    Debug("BEGIN [%lu]", client_seq_num);
-
-    txn = proto::Transaction();
-    txn.set_client_id(client_id);
-    txn.set_client_seq_num(client_seq_num);
-    // Optimistically choose a read timestamp for all reads in this transaction
-    txn.mutable_timestamp()->set_timestamp(timeServer.GetTime());
-    txn.mutable_timestamp()->set_id(client_id);
-    //ここでExecuteNextOperationを実行してるみたい
-    bcby(client_seq_num, rnd, zipf);
   });
 }
 
@@ -309,65 +262,6 @@ void Client::Get(const std::string &key, get_callback gcb,
   });
 }
 
-void Client::Get_ycsb(const std::string &key, get_callback_ycsb gcby,
-    get_timeout_callback gtcb, uint32_t timeout) {
-  
-  transport->Timer(0, [this, key, gcby, gtcb, timeout]() {
-    // Latency_Start(&getLatency);
-    Debug("GET[%lu:%lu] for key %s", client_id, client_seq_num,
-        BytesToHex(key, 16).c_str());
-
-    // Contact the appropriate shard to get the value.
-    std::vector<int> txnGroups(txn.involved_groups().begin(), txn.involved_groups().end());
-    int i = (*part)(key, nshards, -1, txnGroups) % ngroups;
-    // If needed, add this shard to set of participants and send BEGIN.
-    if (!IsParticipant(i)) {
-      txn.add_involved_groups(i);
-      bclient[i]->Begin(client_seq_num);
-    }
-    //rcb関数を作っている
-    read_callback rcb = [gcby, this](int status, const std::string &key,
-        const std::string &val, const Timestamp &ts, const proto::Dependency &dep,
-        bool hasDep, bool addReadSet) {
-      
-      Debug("read_callback is called");
-
-      uint64_t ns = 0; //Latency_End(&getLatency);
-      if (Message_DebugEnabled(__FILE__)) {
-        Debug("GET[%lu:%lu] Callback for key %s with %lu bytes and ts %lu.%lu after %luus.",
-            client_id, client_seq_num, BytesToHex(key, 16).c_str(), val.length(),
-            ts.getTimestamp(), ts.getID(), ns / 1000);
-        if (hasDep) {
-          Debug("GET[%lu:%lu] Callback for key %s with dep ts %lu.%lu.",
-              client_id, client_seq_num, BytesToHex(key, 16).c_str(),
-              dep.write().prepared_timestamp().timestamp(),
-              dep.write().prepared_timestamp().id());
-        }
-      }
-      if (addReadSet) {
-        ReadMessage *read = txn.add_read_set();
-        read->set_key(key);
-        ts.serialize(read->mutable_readtime());
-      }
-      if (hasDep) {
-        *txn.add_deps() = dep;
-      }
-      gcby(status, key, val, ts, rnd, zipf);
-      
-    };
-
-
-    read_timeout_callback rtcb = gtcb;
-
-    // Send the GET operation to appropriate shard.
-    //shardclient.ccのGet関数に飛ぶ
-    bclient[i]->Get(client_seq_num, key, txn.timestamp(), readMessages,
-        readQuorumSize, params.readDepSize, rcb, rtcb, timeout);
-  });
-}
-
-
-
 void Client::Get_batch(const std::vector<std::string>& key_list, std::vector<get_callback>& gcb_list, std::multimap<std::string, int> *keyTxMap,
     get_timeout_callback_batch gtcb, uint32_t timeout) {  
   
@@ -472,35 +366,6 @@ void Client::Put(const std::string &key, const std::string &value,
     // ローカルでバッファリングする。
     // Buffering, so no need to wait.
     bclient[i]->Put(client_seq_num, key, value, pcb, ptcb, timeout);
-  });
-  
-}
-
-void Client::Put_ycsb(const std::string &key, const std::string &value,
-    put_callback_ycsb pcby, put_timeout_callback ptcb, uint32_t timeout) {
-  
-  transport->Timer(0, [this, key, value, pcby, ptcb, timeout]() {
-    //std::cerr << "value size: " << value.size() << "; key " << BytesToHex(key,16).c_str() << std::endl;
-    Debug("PUT[%lu:%lu] for key %s", client_id, client_seq_num, BytesToHex(key,
-          16).c_str());
-
-    // Contact the appropriate shard to set the value.
-    std::vector<int> txnGroups(txn.involved_groups().begin(), txn.involved_groups().end());
-    int i = (*part)(key, nshards, -1, txnGroups) % ngroups;
-
-    // If needed, add this shard to set of participants and send BEGIN.
-    if (!IsParticipant(i)) {
-      txn.add_involved_groups(i);
-      bclient[i]->Begin(client_seq_num);
-    }
-
-    WriteMessage *write = txn.add_write_set();
-    write->set_key(key);
-    write->set_value(value);
-
-    // ローカルでバッファリングする。
-    // Buffering, so no need to wait.
-    bclient[i]->Put_ycsb(client_seq_num, key, value, pcby, ptcb, rnd, zipf,timeout);
   });
   
 }

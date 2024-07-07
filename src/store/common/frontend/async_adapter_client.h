@@ -38,22 +38,14 @@ class AsyncAdapterClient : public AsyncClient {
   // Begin a transaction.
   virtual void Execute(AsyncTransaction *txn, execute_callback ecb, bool retry = false);
 
-  virtual void Execute_ycsb(AsyncTransaction *txn, execute_callback ecb, bool retry = false);
-
   virtual void Execute_batch(AsyncTransaction *txn, execute_big_callback ecb, bool retry = false);
 
  private:
   void ExecuteNextOperation();
-  void ExecuteNextOperation_ycsb(Xoroshiro128Plus &rnd, FastZipf &zipf);
-  void ExecuteNextOperation_ex(uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf);
   void GetCallback(int status, const std::string &key, const std::string &val,
       Timestamp ts);
-  void GetCallback_ycsb(int status, const std::string &key, const std::string &val,
-      Timestamp ts, Xoroshiro128Plus &rnd, FastZipf &zipf);
   void GetTimeout(int status, const std::string &key);
-  void GetTimeout_ycsb(int status, const std::string &key);
   void PutCallback(int status, const std::string &key, const std::string &val);
-  void PutCallback_ycsb(int status, const std::string &key, const std::string &val, Xoroshiro128Plus &rnd, FastZipf &zipf);
   void PutTimeout(int status, const std::string &key, const std::string &val);
   void CommitCallback(transaction_status_t result);
   void CommitBigCallback(transaction_status_t result);
@@ -114,10 +106,6 @@ class AsyncAdapterClient : public AsyncClient {
 
   void GetCallback_batch(int status, const std::string &key,
     const std::string &val, Timestamp ts);
-  
-  void GetTimeout_batch(int status, std::vector<std::string> key_list, std::vector<get_callback> gcb_list, uint32_t timeout);
-
-  void CommitCallback_batch(transaction_status_t result, int txId);
 
   //void ExecuteNextOperation_batch();
 

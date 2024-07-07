@@ -27,16 +27,10 @@
 
 namespace ycsb {
 
-YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps,
-    std::mt19937 &rand) : keySelector(keySelector), numOps(numOps) {
-
+YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps, int readRatio, 
+std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readRatio(readRatio){
   for (int i = 0; i < numOps; ++i) {
-    uint64_t key;
-    if (i < numOps / 2) {
-      key = keySelector->GetKey(rand);
-    } else {
-      key = keyIdxs[i - numOps / 2];
-    }
+    uint64_t key = keySelector->GetKey(rand);
     keyIdxs.push_back(key);
   }
 }

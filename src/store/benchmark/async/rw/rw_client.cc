@@ -54,8 +54,6 @@ AsyncTransaction *RWClient::GetNextTransaction() {
   return rw_tx;
 }
 
-AsyncTransaction *RWClient::GetNextTransaction_ycsb() {}
-
 std::string RWClient::GetLastOp() const {
   return "rw";
 }

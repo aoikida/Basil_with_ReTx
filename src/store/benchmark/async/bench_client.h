@@ -53,7 +53,6 @@ class BenchmarkClient {
 
   void StartLatency();
   virtual void SendNext() = 0;
-  virtual void SendNext_ycsb() = 0;
   virtual void SendNext_batch() = 0;
   void IncrementSent(int result);
   void IncrementSentBig(int result, int abortSize);
@@ -96,7 +95,6 @@ class BenchmarkClient {
   int msSinceStart;
   int opLastInterval;
   bench_done_callback curr_bdcb;
-  bool ycsb;
 };
 
 #endif /* BENCHMARK_CLIENT_H */

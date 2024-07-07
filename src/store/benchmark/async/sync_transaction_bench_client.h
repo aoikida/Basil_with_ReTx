@@ -50,7 +50,6 @@ class SyncTransactionBenchClient : public BenchmarkClient {
  protected:
   virtual SyncTransaction *GetNextTransaction() = 0;
   virtual void SendNext() override;
-  virtual void SendNext_ycsb() override;
   virtual void SendNext_batch() override;
   inline uint32_t GetTimeout() const { return timeout; } 
 

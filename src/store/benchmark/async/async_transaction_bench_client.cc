@@ -55,16 +55,6 @@ void AsyncTransactionBenchClient::SendNext() {
       std::placeholders::_1, std::placeholders::_2));
 }
 
-void AsyncTransactionBenchClient::SendNext_ycsb() {
-  currTxn = GetNextTransaction();
-  Latency_Start(&latency);
-  currTxnAttempts = 0;
-  //common/frontend/async_adapter_client.ccに飛ぶ
-  client.Execute_ycsb(currTxn,
-    std::bind(&AsyncTransactionBenchClient::ExecuteCallback, this,
-      std::placeholders::_1, std::placeholders::_2));
-}
-
 void AsyncTransactionBenchClient::SendNext_batch() {
   currTxn = GetNextTransaction();
   Latency_Start(&latency);
@@ -110,21 +100,12 @@ void AsyncTransactionBenchClient::ExecuteCallback(transaction_status_t result,
       Debug("Backing off for %lums", backoff);
     }
     //std::cerr << "backing off for ms: " << backoff << std::endl;
-    bool ycsb = true;
-    if (ycsb){
-      transport.Timer(backoff, [this]() {
-        client.Execute_ycsb(currTxn,
-            std::bind(&AsyncTransactionBenchClient::ExecuteCallback, this,
-            std::placeholders::_1, std::placeholders::_2), true); //last flag = retry
-        });
-    }
-    else{
-      transport.Timer(backoff, [this]() {
-        client.Execute(currTxn,
-            std::bind(&AsyncTransactionBenchClient::ExecuteCallback, this,
-            std::placeholders::_1, std::placeholders::_2), true); //last flag = retry
-        });
-    }
+    transport.Timer(backoff, [this]() {
+      client.Execute(currTxn,
+          std::bind(&AsyncTransactionBenchClient::ExecuteCallback, this,
+          std::placeholders::_1, std::placeholders::_2), true); //last flag = retry
+      });
+
   }
 }
 

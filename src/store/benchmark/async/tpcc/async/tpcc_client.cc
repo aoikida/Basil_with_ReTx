@@ -77,7 +77,6 @@ AsyncTransaction* AsyncTPCCClient::GetNextTransaction() {
 
 }
 
-AsyncTransaction* AsyncTPCCClient::GetNextTransaction_ycsb() {}
 
 AsyncTransaction* AsyncTPCCClient::GetNextTransaction_batch() {}
 

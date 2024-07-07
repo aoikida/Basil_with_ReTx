@@ -49,7 +49,6 @@ public:
 protected:
     virtual AsyncTransaction *GetNextTransaction() = 0;
     virtual void SendNext();
-    virtual void SendNext_ycsb();
     virtual void SendNext_batch();
 
     void ExecuteCallback(transaction_status_t result,

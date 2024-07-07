@@ -134,10 +134,6 @@ class ShardClient : public TransportReceiver, public PingInitiator, public PingT
   virtual void Put(uint64_t id, const std::string &key,
       const std::string &value, put_callback pcb, put_timeout_callback ptcb,
       uint32_t timeout);
-  
-  virtual void Put_ycsb(uint64_t id, const std::string &key,
-      const std::string &value, put_callback_ycsb pcb, put_timeout_callback ptcb, Xoroshiro128Plus &rnd, FastZipf &zipf,
-      uint32_t timeout);
 
   virtual void Phase1(uint64_t id, const proto::Transaction &transaction, const std::string &txnDigest,
     phase1_callback pcb, phase1_timeout_callback ptcb, relayP1_callback rcb, finishConflictCB fcb, uint32_t timeout);
@@ -387,8 +383,6 @@ virtual void Phase2Equivocate_Simulate(uint64_t id, const proto::Transaction &tx
 
   /* Timeout for Get requests, which only go to one replica. */
   void GetTimeout(uint64_t reqId);
-
-  //void GetTimeout_batch(uint64_t reqId);
 
   /* Callbacks for hearing back from a shard for an operation. */
   void HandleReadReply(const proto::ReadReply &readReply);

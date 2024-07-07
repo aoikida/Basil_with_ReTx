@@ -2,7 +2,7 @@
 
 F=0
 NUM_GROUPS=1
-CONFIG="shard-r6.config"
+CONFIG="shard-r0.config"
 PROTOCOL="indicus"
 STORE=${PROTOCOL}store
 DURATION=1

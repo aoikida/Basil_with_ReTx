@@ -57,17 +57,11 @@ class Client : public ::Client {
   virtual void Begin(begin_callback bcb, begin_timeout_callback btcb,
       uint32_t timeout, bool retry = false) override;
 
-  virtual void Begin_ycsb(begin_callback_ycsb bcby, begin_timeout_callback btcb,
-      uint32_t timeout, bool retry = false) override;
-
   virtual void Begin_batch(begin_callback_batch bcb, begin_timeout_callback btcb,
       uint32_t timeout, bool retry = false) override;
 
   // Get the value corresponding to key.
   virtual void Get(const std::string &key, get_callback gcb,
-      get_timeout_callback gtcb, uint32_t timeout) override;
-  
-  virtual void Get_ycsb(const std::string &key, get_callback_ycsb gcby,
       get_timeout_callback gtcb, uint32_t timeout) override;
 
   // 追加
@@ -77,10 +71,6 @@ class Client : public ::Client {
   // Set the value for the given key.
   virtual void Put(const std::string &key, const std::string &value,
       put_callback pcb, put_timeout_callback ptcb,
-      uint32_t timeout) override;
-
-  virtual void Put_ycsb(const std::string &key, const std::string &value,
-      put_callback_ycsb pcby, put_timeout_callback ptcb,
       uint32_t timeout) override;
   
   virtual void Put_batch(const std::string &key, const std::string &value,

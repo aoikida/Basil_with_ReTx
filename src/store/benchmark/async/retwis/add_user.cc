@@ -49,13 +49,11 @@ Operation AddUser::GetNextOperation(size_t outstandingOpCount, size_t finishedOp
   }
 }
 
-Operation AddUser::GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf){}
-
+/*
 //追加
 Operation AddUser::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf){}
-
+*/
 } // namespace retwis
 
 //オペレーションを4つ実行する、outstandingOpCount == finishedOpCountを満たすとCommitする。

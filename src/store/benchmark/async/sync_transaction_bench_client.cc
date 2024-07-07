@@ -52,9 +52,6 @@ void SyncTransactionBenchClient::SendNext() {
   SendNext(&result);
 }
 
-void SyncTransactionBenchClient::SendNext_ycsb() {
-}
-
 
 void SyncTransactionBenchClient::SendNext_batch() {
 }

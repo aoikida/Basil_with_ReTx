@@ -50,8 +50,6 @@ class AsyncClient {
   // Begin a transaction.
   virtual void Execute(AsyncTransaction *txn, execute_callback ecb, bool retry=false) = 0;
 
-  virtual void Execute_ycsb(AsyncTransaction *txn, execute_callback ecb, bool retry=false) = 0;
-
   virtual void Execute_batch(AsyncTransaction *txn, execute_big_callback ecb, bool retry=false) = 0;
 
   inline const Stats &GetStats() const { return stats; }
