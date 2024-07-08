@@ -127,6 +127,6 @@ Operation AsyncOrderStatus::GetNextOperation(size_t outstandingOpCount, size_t f
 
 
 Operation AsyncOrderStatus::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-  std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {}
+  std::map<std::string, std::string> readValues, int batchSize) {}
 */
 }

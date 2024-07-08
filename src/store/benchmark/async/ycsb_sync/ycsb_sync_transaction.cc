@@ -97,9 +97,9 @@ Operation SyncYCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_
   }
 }
 
-
+/*
 Operation SyncYCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {
+    std::map<std::string, std::string> readValues, int batchSize) {
 
   Debug("readRatio:%d\n", readRatio);
   Debug("numKeys:%d\n", numKeys);
@@ -129,5 +129,6 @@ Operation SyncYCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount,
     exit(1);
   }
 }
+*/
 
 } // namespace ycsb

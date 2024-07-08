@@ -34,8 +34,6 @@
 #include "lib/latency.h"
 #include "store/indicusstore/verifier.h"
 #include "lib/tcptransport.h"
-#include "store/common/random.h"
-#include "store/common/zipf.h"
 
 #include <map>
 #include <string>

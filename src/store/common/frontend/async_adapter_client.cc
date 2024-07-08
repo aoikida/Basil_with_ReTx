@@ -51,14 +51,14 @@ void AsyncAdapterClient::Execute_batch(AsyncTransaction *txn,
   currEcbcb = ecb;
   currTxn = txn;
   readValues.clear();
-  client->Begin_batch([this](uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums) {
+  client->Begin_batch([this](uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums) {
     //元々ExecuteNextOperation_ex()になっていたが、ExecuteNextOperation()に変更
     ExecuteNextOperation();
   }, []{}, timeout, retry);
 }
 
 /*
-void AsyncAdapterClient::MakeTransaction_no_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums){
+void AsyncAdapterClient::MakeTransaction_no_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums){
 
   int tx_num = 0;
   int thisTxWrite = 0;
@@ -182,7 +182,7 @@ void AsyncAdapterClient::MakeTransaction_no_abort(uint64_t txNum, uint64_t txSiz
 */
 
 /*
-void AsyncAdapterClient::MakeTransaction_single_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums){
+void AsyncAdapterClient::MakeTransaction_single_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums){
 
   int tx_num = 0;
   bool tx_conflict_finish = false;
@@ -536,7 +536,7 @@ MAKE_TX_FIN:
 */
 
 /*
-void AsyncAdapterClient::MakeTransaction_multi_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums){
+void AsyncAdapterClient::MakeTransaction_multi_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums){
 
   int tx_num = 0;
   bool tx_conflict_finish = false;

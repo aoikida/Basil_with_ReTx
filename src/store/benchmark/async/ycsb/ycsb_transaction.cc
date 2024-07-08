@@ -32,6 +32,7 @@ YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps, int readR
 std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readRatio(readRatio){
   for (int i = 0; i < numOps; ++i) {
     uint64_t key = keySelector->GetKey(rand);
+    std::cout << "key:" << key << std::endl;
     keyIdxs.push_back(key);
   }
 }
@@ -47,14 +48,12 @@ Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t fi
       return Wait();
     }
     else if ((rand() % 100) < readRatio) {
-      std::string key = keySelector->GetKey(finishedOpCount);
-      std::cerr << "read: " << key << std::endl;
-      return Get(key);
+      std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
+      return Get(GetKey(finishedOpCount));
     } 
     else {
-        std::string key = keySelector->GetKey(finishedOpCount);
-        std::cerr << "write: " << key << std::endl;
-        auto strValueItr = readValues.find(key);
+        std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
+        auto strValueItr = readValues.find(GetKey(finishedOpCount));
 
         std::string strValue;
         if (strValueItr != readValues.end()) {
@@ -76,7 +75,7 @@ Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t fi
                 writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
             }
         }
-        return Put(key, writeValue);
+        return Put(GetKey(finishedOpCount), writeValue);
     }
   }
   else if (finishedOpCount == GetNumOps()) {
@@ -91,7 +90,7 @@ Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t fi
 /*
 
 Operation YCSBTransaction::GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf) {
+    std::map<std::string, std::string> readValues) {
     //std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
     if(finishedOpCount != outstandingOpCount){
       return Wait();
@@ -109,7 +108,7 @@ Operation YCSBTransaction::GetNextOperation_ycsb(size_t outstandingOpCount, size
 }
 
 Operation YCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {
+    std::map<std::string, std::string> readValues, int batchSize) {
 
   if (outstandingOpCount < GetNumOps() * batchSize) {
     Debug("outstanding: %d, finished: %d, num ops: %d, batchSize: %d \n", outstandingOpCount, finishedOpCount, GetNumOps(), batchSize);

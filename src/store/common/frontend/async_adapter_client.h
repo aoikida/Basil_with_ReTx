@@ -54,9 +54,9 @@ class AsyncAdapterClient : public AsyncClient {
   void AbortTimeout();
 
   //追加
-  void MakeTransaction_no_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums);
-  void MakeTransaction_single_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums);
-  void MakeTransaction_multi_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf, std::vector<int> abort_tx_nums);
+  void MakeTransaction_no_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums);
+  void MakeTransaction_single_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums);
+  void MakeTransaction_multi_abort(uint64_t txNum, uint64_t txSize, uint64_t batchSize, std::vector<int> abort_tx_nums);
   void ExecuteWriteOperation();
   void ExecuteReadOperation();
   void ExecuteCommit();

@@ -579,10 +579,6 @@ int main(int argc, char **argv) {
 "           processing systems.");
 	gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  Xoroshiro128Plus rnd;
-  rnd.init();
-  FastZipf zipf(&rnd, FLAGS_zipf_coefficient, FLAGS_num_keys);
-
   // parse transport protocol
   transmode_t trans = TRANS_UNKNOWN;
   int numTransModes = sizeof(trans_args);
@@ -964,7 +960,7 @@ int main(int argc, char **argv) {
                                           FLAGS_num_shards,
                                           FLAGS_num_groups, closestReplicas, FLAGS_ping_replicas, tport, part,
                                           FLAGS_tapir_sync_commit, readMessages, readQuorumSize,
-                                          params, keyManager, FLAGS_indicus_phase1DecisionTimeout, rnd, zipf,
+                                          params, keyManager, FLAGS_indicus_phase1DecisionTimeout,
 																					FLAGS_indicus_max_consecutive_abstains,
 																					TrueTime(FLAGS_clock_skew, FLAGS_clock_error));
         break;
@@ -1122,26 +1118,19 @@ int main(int argc, char **argv) {
       case BENCH_RETWIS:
       case BENCH_TPCC:
       case BENCH_RW:
-        tport->Timer(0, [bench, bdcb]() { bench->Start(bdcb, FLAGS_batch_optimization, 0); });
+        tport->Timer(0, [bench, bdcb]() { bench->Start(bdcb, FLAGS_batch_optimization); });
         break;
       case BENCH_YCSB:
         //async benchmarks
-	      tport->Timer(0, [bench, bdcb]() { bench->Start(bdcb, FLAGS_batch_optimization, 1); });
+	      tport->Timer(0, [bench, bdcb]() { bench->Start(bdcb, FLAGS_batch_optimization); });
         break;
-      /*
-      case BENCH_YCSB:
-        threads.push_back(new std::thread([bench, bdcb](){
-          tport->Timer(0, [bench, bdcb]() { bench->Start(bdcb, FLAGS_batch_optimization, 1); });
-        }));
-        break;
-      */
       case BENCH_SMALLBANK_SYNC:
       case BENCH_TPCC_SYNC:
       case BENCH_YCSB_SYNC: {
         SyncTransactionBenchClient *syncBench = dynamic_cast<SyncTransactionBenchClient *>(bench);
         UW_ASSERT(syncBench != nullptr);
         threads.push_back(new std::thread([syncBench, bdcb](){
-            syncBench->Start([](){}, FLAGS_batch_optimization, 1);
+            syncBench->Start([](){}, FLAGS_batch_optimization);
             if (FLAGS_batch_optimization == false){
               while (!syncBench->IsFullyDone()) {
                 syncBench->StartLatency();

@@ -44,7 +44,7 @@ class BenchmarkClient {
   virtual ~BenchmarkClient();
 
   //変更
-  void Start(bench_done_callback bdcb, bool batchOptimization, bool benchmark);
+  void Start(bench_done_callback bdcb, bool batchOptimization);
   void OnReply(int result);
 
   void OnReplyBig(int result, int batch_size, int abortSize);

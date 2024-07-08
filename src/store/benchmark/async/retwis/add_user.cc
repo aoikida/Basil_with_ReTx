@@ -52,7 +52,7 @@ Operation AddUser::GetNextOperation(size_t outstandingOpCount, size_t finishedOp
 /*
 //追加
 Operation AddUser::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf){}
+      std::map<std::string, std::string> readValues, int batchSize){}
 */
 } // namespace retwis
 

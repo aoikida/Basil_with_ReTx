@@ -31,6 +31,21 @@ namespace rw {
 
 RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, bool readOnly, 
 std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readOnly(readOnly){
+  for (int i = 0; i < numOps; ++i) {
+    uint64_t key;
+    if (i % 2 == 0) {
+      key = keySelector->GetKey(rand);
+    } else {
+      key = keyIdxs[i - 1];
+    }
+    std::cout << "key:" << key << std::endl;
+    keyIdxs.push_back(key);
+  }
+}
+
+/*
+RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, bool readOnly, 
+std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readOnly(readOnly){
   // バッチ用に改変
   // readの後にwriteを行うというベンチマークで、それそれ同じキーを処理する。
   int batchSize = 2;
@@ -44,6 +59,7 @@ std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readOnly(readOnl
     keyIdxs.push_back(key);
   }
 }
+*/
 
 RWTransaction::~RWTransaction() {
 }
@@ -51,15 +67,15 @@ RWTransaction::~RWTransaction() {
 Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues) {
   if (outstandingOpCount < GetNumOps()) {
-    //std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
+    std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
     if(finishedOpCount != outstandingOpCount){
       return Wait();
     }
     else if (readOnly || outstandingOpCount % 2 == 0) {
-      //std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
+      std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
       return Get(GetKey(finishedOpCount));
     } else  {
-      //std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
+      std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
       auto strValueItr = readValues.find(GetKey(finishedOpCount));
       UW_ASSERT(strValueItr != readValues.end());
       std::string strValue = strValueItr->second;
@@ -87,7 +103,7 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
 /*
 
 Operation RWTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf) {
+    std::map<std::string, std::string> readValues, int batchSize) {
   if (outstandingOpCount < GetNumOps() * batchSize) {
     std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << "batchSize: " << batchSize << std::endl;
     if(finishedOpCount != outstandingOpCount){

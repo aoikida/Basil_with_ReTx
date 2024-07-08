@@ -45,8 +45,6 @@
 #include "store/indicusstore/indicus-proto.pb.h"
 #include <sys/time.h>
 #include "store/common/stats.h"
-#include "store/common/random.h"
-#include "store/common/zipf.h"
 #include <unistd.h>
 
 #include <thread>
@@ -72,7 +70,6 @@ class Client : public ::Client {
       Transport *transport, Partitioner *part, bool syncCommit,
       uint64_t readMessages, uint64_t readQuorumSize,
       Parameters params, KeyManager *keyManager, uint64_t phase1DecisionTimeout,
-      Xoroshiro128Plus &rnd, FastZipf &zipf,
       uint64_t consecutiveMax = 1UL,  
       TrueTime timeserver = TrueTime(0,0));
   virtual ~Client();
@@ -319,9 +316,6 @@ class Client : public ::Client {
   std::vector<finishConflictCB> finishConflictCB_batch;
   int writeback_tx_num = 0;
   std::vector<int> abort_tx_nums;
-
-  Xoroshiro128Plus rnd;
-  FastZipf zipf;
   
 
   // Outstanding requests.

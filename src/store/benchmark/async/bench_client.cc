@@ -67,7 +67,7 @@ BenchmarkClient::BenchmarkClient(Transport &transport, uint64_t id,
 BenchmarkClient::~BenchmarkClient() {
 }
 
-void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization, bool benchmark) {
+void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization) {
   Debug("BenchmarkClient::Start\n");
 	n = 0;
   curr_bdcb = bdcb;
@@ -80,9 +80,7 @@ void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization, bo
 		transport.Timer(tputInterval, std::bind(&BenchmarkClient::TimeInterval,
 				this));
   }
-  //ここがレイテンシ測定のstart
   Latency_Start(&latency);
-  //この行き先は、async_transaction_bench_client
   if (batchOptimization){
     SendNext_batch();
   }

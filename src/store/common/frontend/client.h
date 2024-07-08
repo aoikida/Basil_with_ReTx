@@ -14,8 +14,6 @@
 #include "store/common/stats.h"
 #include "store/common/timestamp.h"
 #include "store/common/partitioner.h"
-#include "store/common/random.h"
-#include "store/common/zipf.h"
 
 #include <functional>
 #include <string>
@@ -29,16 +27,12 @@ enum transaction_status_t {
 };
 
 typedef std::function<void(uint64_t)> begin_callback;
-typedef std::function<void(uint64_t, Xoroshiro128Plus &, FastZipf &)> begin_callback_ycsb;
-typedef std::function<void(uint64_t, uint64_t, uint64_t, Xoroshiro128Plus &, FastZipf &, std::vector<int>)> begin_callback_batch;
+typedef std::function<void(uint64_t, uint64_t, uint64_t, std::vector<int>)> begin_callback_batch;
 
 typedef std::function<void()> begin_timeout_callback;
 
 typedef std::function<void(int, const std::string &,
     const std::string &, Timestamp)> get_callback;
-
-typedef std::function<void(int, const std::string &,
-    const std::string &, Timestamp, Xoroshiro128Plus &, FastZipf &)> get_callback_ycsb;
 
 typedef std::function<void(int, const std::string &)> get_timeout_callback;
 
@@ -47,9 +41,6 @@ typedef std::function<void(int, std::vector<std::string>, std::vector<get_callba
 
 typedef std::function<void(int, const std::string &,
     const std::string &)> put_callback;
-
-typedef std::function<void(int, const std::string &,
-    const std::string &, Xoroshiro128Plus &, FastZipf &)> put_callback_ycsb;
 
 typedef std::function<void(int, const std::string &,
     const std::string &)> put_timeout_callback;

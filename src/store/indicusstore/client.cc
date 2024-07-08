@@ -44,7 +44,7 @@ Client::Client(transport::Configuration *config, uint64_t id, int nShards,
     const std::vector<int> &closestReplicas, bool pingReplicas, Transport *transport,
     Partitioner *part, bool syncCommit, uint64_t readMessages,
     uint64_t readQuorumSize, Parameters params,
-    KeyManager *keyManager, uint64_t phase1DecisionTimeout, Xoroshiro128Plus &rnd, FastZipf &zipf, uint64_t consecutiveMax, TrueTime timeServer)
+    KeyManager *keyManager, uint64_t phase1DecisionTimeout, uint64_t consecutiveMax, TrueTime timeServer)
     : config(config), client_id(id), nshards(nShards), ngroups(nGroups),
     transport(transport), part(part), syncCommit(syncCommit), pingReplicas(pingReplicas),
     readMessages(readMessages), readQuorumSize(readQuorumSize),
@@ -52,8 +52,7 @@ Client::Client(transport::Configuration *config, uint64_t id, int nShards,
     keyManager(keyManager),
     timeServer(timeServer), first(true), startedPings(false),
     client_seq_num(0UL), lastReqId(0UL), getIdx(0UL),
-    failureEnabled(false), failureActive(false), faulty_counter(0UL),
-    rnd(rnd), zipf(zipf), consecutiveMax(consecutiveMax){
+    failureEnabled(false), failureActive(false), faulty_counter(0UL), consecutiveMax(consecutiveMax){
 
   Debug("Initializing Indicus client with id [%lu] %lu", client_id, nshards);
   std::cerr<< "P1 Decision Timeout: " <<phase1DecisionTimeout<< std::endl;
@@ -201,7 +200,7 @@ void Client::Begin_batch(begin_callback_batch bcb, begin_timeout_callback btcb,
     txn.mutable_timestamp()->set_timestamp(timeServer.GetTime());
     txn.mutable_timestamp()->set_id(client_id);
     //ここでExecuteNextOperationを実行してるみたい
-    bcb(client_seq_num, params.numOps, params.batchSize, rnd, zipf, abort_tx_nums);
+    bcb(client_seq_num, params.numOps, params.batchSize, abort_tx_nums);
   });
 }
 

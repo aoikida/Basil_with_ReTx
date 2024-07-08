@@ -44,11 +44,8 @@ class YCSBTransaction : public AsyncTransaction {
       std::map<std::string, std::string> readValues);
 
   /*
-  virtual Operation GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, Xoroshiro128Plus &rnd, FastZipf &zipf);
-  
   virtual Operation GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize, Xoroshiro128Plus &rnd, FastZipf &zipf);
+      std::map<std::string, std::string> readValues, int batchSize);
   */
 
   inline const std::vector<int> getKeyIdxs() const {
