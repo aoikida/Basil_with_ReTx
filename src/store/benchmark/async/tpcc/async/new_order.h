@@ -46,13 +46,9 @@ class AsyncNewOrder : public AsyncTPCCTransaction, public NewOrder {
 
   Operation GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues);
+
+  Operation GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues);
   
-  /*
-
-
-  Operation GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize);
-  */
  protected:
   uint32_t o_id;
 

@@ -47,10 +47,10 @@ Operation GetTimeline::GetNextOperation(size_t outstandingOpCount, size_t finish
     return Wait();
   }
 }
-/*
 
-//追加
-Operation GetTimeline::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize){}
-*/
+
+
+Operation GetTimeline::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues){}
+
+
 } // namespace retwis

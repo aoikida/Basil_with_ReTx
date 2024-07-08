@@ -54,9 +54,5 @@ Operation Follow::GetNextOperation(size_t outstandingOpCount, size_t finishedOpC
   }
 }
 
-/*
-//追加
-Operation Follow::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize){}
-*/
+Operation Follow::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues){}
 } // namespace retwis

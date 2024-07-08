@@ -45,11 +45,9 @@ class AsyncStockLevel : public AsyncTPCCTransaction, public StockLevel {
 
   Operation GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues);
-  /*
-
-  Operation GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize);
-  */
+  
+  Operation GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues);
+  
  protected:
   uint32_t next_o_id;
   uint32_t currOrderIdx;

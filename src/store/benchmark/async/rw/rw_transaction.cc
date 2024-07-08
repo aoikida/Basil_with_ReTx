@@ -100,109 +100,42 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
     return Wait();
   }
 }
-/*
 
-Operation RWTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, int batchSize) {
-  if (outstandingOpCount < GetNumOps() * batchSize) {
-    std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << "batchSize: " << batchSize << std::endl;
-    if(finishedOpCount != outstandingOpCount){
-      return Wait();
-    }
-    else if (outstandingOpCount % 2 == 0) {
-      std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
-      return Get(GetKey(finishedOpCount));
-    } else  {
-      std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
-      auto strValueItr = readValues.find(GetKey(finishedOpCount));
-      //UW_ASSERT(strValueItr != readValues.end());
-      std::string strValue = strValueItr->second;
+
+Operation RWTransaction::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
+  
+  Debug("Operation count: %d\n", OpCount);
+  if (OpCount % 2 == 0) {
+    std::cerr << "read: " << GetKey(OpCount) << std::endl;
+    return Get(GetKey(OpCount));
+  } 
+  else {
+      std::cerr << "write: " << GetKey(OpCount) << std::endl;
+      auto strValueItr = readValues.find(GetKey(OpCount));
+
+      std::string strValue;
+      if (strValueItr != readValues.end()) {
+          strValue = strValueItr->second;
+      } else {
+          strValue = "";
+      }
+
       std::string writeValue;
       if (strValue.length() == 0) {
-        writeValue = std::string(100, '\0'); //make a longer string
+          writeValue = std::string(100, '\0'); // make a longer string
       } else {
-        uint64_t intValue = 0;
-        for (int i = 0; i < 100; ++i) {
-          intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
-        }
-        intValue++;
-        for (int i = 0; i < 100; ++i) {
-          writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
-        }
+          uint64_t intValue = 0;
+          for (int i = 0; i < 100; ++i) {
+              intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
+          }
+          intValue++;
+          for (int i = 0; i < 100; ++i) {
+              writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
+          }
       }
-      return Put(GetKey(finishedOpCount), writeValue);
-    }
-  } else if (finishedOpCount == GetNumOps() * batchSize + 1) {
-    //バッチ最適化法では、コミット必要なしかも
-    return Commit();
-  } else {
-    return Wait();
+      return Put(GetKey(OpCount), writeValue);
   }
 }
-*/
-/*
-Operation RWTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, int batchSize) {
-  // 変更点 : Getkey(finishedOpCount)のfinishedOpCountをrandomに変えたい。
-  if (outstandingOpCount < GetNumOps() * batchSize + 1) {
-    //std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
-    if(finishedOpCount != outstandingOpCount){
-      return Wait();
-    }
-    else if (readOnly || outstandingOpCount % 2 == 0) {
-      //std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
-      Operation op = Get(GetKey(finishedOpCount));
-      pre_read_set.push_back(op);
-      for(auto itr = write_set.begin(); itr != write_set.end(); ++itr){
-        if ((*itr).key == op.key){
-          NowBatchSize = finishedOpCount / GetNumOps() + 1;
-          batch_finish = true;
-          batch_size = max_batch_size;
-        }
-      }
-      
-    } else  {
-      //std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
-      auto strValueItr = readValues.find(GetKey(finishedOpCount));
-      UW_ASSERT(strValueItr != readValues.end());
-      std::string strValue = strValueItr->second;
-      std::string writeValue;
-      if (strValue.length() == 0) {
-        writeValue = std::string(100, '\0'); //make a longer string
-      } else {
-        uint64_t intValue = 0;
-        for (int i = 0; i < 100; ++i) {
-          intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
-        }
-        intValue++;
-        for (int i = 0; i < 100; ++i) {
-          writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
-        }
-      }
-      Operation op = Put(GetKey(finishedOpCount), writeValue);
-      pre_write_set.push_back(op);
-      return op;
-    }
-    if (finishedOpCount == GetNumOps()){
-      if (batch_finish == false){
-        for(auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
-          read_set.push_back(*itr);
-        }
-        for(auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
-          write_set.push_back(*itr);
-        }
 
-        pre_write_set.clear();
-        pre_read_set.clear();
-        batch_size++;
-      }
-    }
-  } else if (finishedOpCount == GetNumOps() * batchSize + 1) {
-    return Commit();
-  } else {
-    return Wait();
-  }
-}
-*/
 
 } // namespace rw

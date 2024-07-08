@@ -208,9 +208,7 @@ Operation AsyncNewOrder::GetNextOperation(size_t outstandingOpCount, size_t fini
     return Wait();
   }
 }
-/*
 
-Operation AsyncNewOrder::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-  std::map<std::string, std::string> readValues, int batchSize) {}
-*/
+Operation AsyncNewOrder::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {}
+
 }

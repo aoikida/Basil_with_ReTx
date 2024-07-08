@@ -53,11 +53,8 @@ class AsyncDelivery : public AsyncTPCCTransaction, public Delivery {
   Operation GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
       std::map<std::string, std::string> readValues);
 
-  /*
-  
-  Operation GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize);
-  */
+  Operation GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues);
+
 
  private:
   uint8_t currDId;

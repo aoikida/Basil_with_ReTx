@@ -101,10 +101,8 @@ Operation AsyncStockLevel::GetNextOperation(size_t outstandingOpCount, size_t fi
   }
 }
 
-/*
 
-Operation AsyncStockLevel::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-  std::map<std::string, std::string> readValues, int batchSize) {}
-*/
+Operation AsyncStockLevel::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {}
+
 
 }

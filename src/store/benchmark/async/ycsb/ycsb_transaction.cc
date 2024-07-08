@@ -87,49 +87,41 @@ Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t fi
   }
 }
 
-/*
 
-Operation YCSBTransaction::GetNextOperation_ycsb(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues) {
-    //std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
-    if(finishedOpCount != outstandingOpCount){
-      return Wait();
-    }
-    else if ((rnd.next() % 100) < readRatio) {
-      std::string key = keySelector->GetKey(zipf() % numKeys);
-      return Get(key);
-    } 
-    else  {
-      std::string key = keySelector->GetKey(zipf() % numKeys);
-      std::string writeValue;
-      writeValue = std::string(100, '\0'); //make a longer string
-      return Put(key, writeValue);
-    }
-}
-
-Operation YCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-    std::map<std::string, std::string> readValues, int batchSize) {
-
-  if (outstandingOpCount < GetNumOps() * batchSize) {
-    Debug("outstanding: %d, finished: %d, num ops: %d, batchSize: %d \n", outstandingOpCount, finishedOpCount, GetNumOps(), batchSize);
-    if ((rnd.next() % 100) < readRatio) {
-      std::string key = keySelector->GetKey(zipf() % numKeys);
-      Debug("read: %d\n", key);
-      return Get(key);
-    } 
-    else  {
-      std::string key = keySelector->GetKey(zipf() % numKeys);
-      Debug("write: %d\n", key);
-      std::string writeValue;
-      writeValue = std::string(100, '\0'); //make a longer string
-      return Put(key, writeValue);
-    }
+Operation YCSBTransaction::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
+  
+  Debug("Operation count: %d\n", OpCount);
+  if ((rand() % 100) < readRatio) {
+    std::cerr << "read: " << GetKey(OpCount) << std::endl;
+    return Get(GetKey(OpCount));
   } 
   else {
-    Debug("outstandingOpCount :%d", outstandingOpCount);
-    std::cerr << "unnecessary transaction is made" << std::endl;
+      std::cerr << "write: " << GetKey(OpCount) << std::endl;
+      auto strValueItr = readValues.find(GetKey(OpCount));
+
+      std::string strValue;
+      if (strValueItr != readValues.end()) {
+          strValue = strValueItr->second;
+      } else {
+          strValue = "";
+      }
+
+      std::string writeValue;
+      if (strValue.length() == 0) {
+          writeValue = std::string(100, '\0'); // make a longer string
+      } else {
+          uint64_t intValue = 0;
+          for (int i = 0; i < 100; ++i) {
+              intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
+          }
+          intValue++;
+          for (int i = 0; i < 100; ++i) {
+              writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
+          }
+      }
+      return Put(GetKey(OpCount), writeValue);
   }
 }
-*/
+
 
 } // namespace ycsb

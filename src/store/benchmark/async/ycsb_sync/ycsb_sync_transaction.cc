@@ -101,11 +101,6 @@ Operation SyncYCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_
 Operation SyncYCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues, int batchSize) {
 
-  Debug("readRatio:%d\n", readRatio);
-  Debug("numKeys:%d\n", numKeys);
-
-
-
   if (outstandingOpCount < GetNumOps() * batchSize) {
     Debug("outstanding: %d, finished : %d, num ops: %d, batchSize: %d", outstandingOpCount, finishedOpCount, GetNumOps(), batchSize);
     if(finishedOpCount != outstandingOpCount){
@@ -130,5 +125,6 @@ Operation SyncYCSBTransaction::GetNextOperation_batch(size_t outstandingOpCount,
   }
 }
 */
+
 
 } // namespace ycsb

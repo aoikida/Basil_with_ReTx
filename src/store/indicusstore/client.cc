@@ -200,7 +200,7 @@ void Client::Begin_batch(begin_callback_batch bcb, begin_timeout_callback btcb,
     txn.mutable_timestamp()->set_timestamp(timeServer.GetTime());
     txn.mutable_timestamp()->set_id(client_id);
     //ここでExecuteNextOperationを実行してるみたい
-    bcb(client_seq_num, params.numOps, params.batchSize, abort_tx_nums);
+    bcb(client_seq_num, params.numOps, params.batchSize);
   });
 }
 

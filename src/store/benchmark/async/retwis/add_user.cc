@@ -49,11 +49,10 @@ Operation AddUser::GetNextOperation(size_t outstandingOpCount, size_t finishedOp
   }
 }
 
-/*
-//追加
-Operation AddUser::GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      std::map<std::string, std::string> readValues, int batchSize){}
-*/
+
+
+Operation AddUser::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues){}
+
 } // namespace retwis
 
 //オペレーションを4つ実行する、outstandingOpCount == finishedOpCountを満たすとCommitする。

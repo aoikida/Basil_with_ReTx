@@ -41,11 +41,10 @@ class AsyncTransaction {
 
   virtual Operation GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
       const std::map<std::string, std::string> readValues) = 0;
-  /*
+  
 
-  virtual Operation GetNextOperation_batch(size_t outstandingOpCount, size_t finishedOpCount,
-      const std::map<std::string, std::string> readValues, int batchSize) = 0;
-  */
+  virtual Operation GetNextOperation_batch(size_t OpCount, const std::map<std::string, std::string> readValues) = 0;
+  
 };
 
 #endif

@@ -27,7 +27,7 @@ enum transaction_status_t {
 };
 
 typedef std::function<void(uint64_t)> begin_callback;
-typedef std::function<void(uint64_t, uint64_t, uint64_t, std::vector<int>)> begin_callback_batch;
+typedef std::function<void(uint64_t, uint64_t, uint64_t)> begin_callback_batch;
 
 typedef std::function<void()> begin_timeout_callback;
 
