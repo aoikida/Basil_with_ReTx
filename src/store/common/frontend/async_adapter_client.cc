@@ -71,7 +71,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   readOpNum = 0;
   write_set.clear();
   writeOpNum = 0;
-  txNum_writeSet.clear();
   writeread = false;
   readwrite = false;
 
@@ -170,7 +169,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
         write_set.push_back(*itr);
         writeOpNum++;
       }
-      txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
       pre_write_set.clear();
       pre_read_set.clear();
       transaction.clear();
@@ -279,8 +277,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
         write_set.push_back(*itr);
         writeOpNum++;
       }
-
-      txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
 
       pre_write_set.clear();
       pre_read_set.clear();

@@ -64,7 +64,6 @@ class AsyncAdapterClient : public AsyncClient {
   int getCbCount = 0;
   int commitCbCount = 0;
   std::vector<transaction_status_t> results;
-  std::vector<std::pair<int, std::vector<Operation>>> txNum_writeSet;
 
   Client *client;
   uint32_t timeout;
