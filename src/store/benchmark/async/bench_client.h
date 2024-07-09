@@ -49,8 +49,6 @@ class BenchmarkClient {
 
   void OnReplyBig(int result, int batch_size, int abortSize);
 
-  void OnReply_batch(std::vector<transaction_status_t> results);
-
   void StartLatency();
   virtual void SendNext() = 0;
   virtual void SendNext_batch() = 0;

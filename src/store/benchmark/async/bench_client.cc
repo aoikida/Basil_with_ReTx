@@ -171,7 +171,7 @@ void BenchmarkClient::OnReply(int result) {
 }
 
 void BenchmarkClient::OnReplyBig(int result, int batch_size, int abortSize) {
-  Debug("BenchmarkClient::OnReply");
+  Debug("BenchmarkClient::OnReplyBig");
 
   for (int i = 0; i< batch_size; i++){
     if (i== 0){
@@ -182,27 +182,6 @@ void BenchmarkClient::OnReplyBig(int result, int batch_size, int abortSize) {
     }
     
   }
-
-  if (done) {
-    return;
-  }
-
-  if (delay == 0) { 
-    Latency_Start(&latency);
-    SendNext_batch();
-  } else {
-    uint64_t rdelay = rand() % delay*2;
-    transport.Timer(rdelay, std::bind(&BenchmarkClient::SendNext_batch, this));
-  }
-}
-
-
-
-
-void BenchmarkClient::OnReply_batch(std::vector<transaction_status_t> results) {
-  Debug("BenchmarkClient::OnReply");
-
-  IncrementSent_batch(results);
 
   if (done) {
     return;
