@@ -117,12 +117,6 @@ void Client::Get(const std::string &key, get_callback gcb,
   });
 }
 
-void Client::Get_batch(const std::vector<std::string> &key_list, std::vector<get_callback> &gcb_list, std::multimap<std::string, int> *keyTxMap,
-      get_timeout_callback_batch gtcb, uint32_t timeout) {
-      
-    //ここも何も記述しない。基底クラスの関数をオーバライドするために使用する。
-}
-
 void Client::Put(const std::string &key, const std::string &value,
     put_callback pcb, put_timeout_callback ptcb, uint32_t timeout) {
   transport->Timer(0, [this, key, value, pcb, ptcb, timeout]() {
@@ -142,9 +136,6 @@ void Client::Put(const std::string &key, const std::string &value,
   });
 }
 
-void Client::Put_batch(const std::string &key, const std::string &value,
-    put_callback pcb, put_timeout_callback ptcb, int batch_num, uint32_t timeout) {}
-
 void Client::Commit(commit_callback ccb, commit_timeout_callback ctcb,
     uint32_t timeout) {
   transport->Timer(0, [this, ccb, ctcb, timeout]() {
@@ -162,9 +153,6 @@ void Client::Commit(commit_callback ccb, commit_timeout_callback ctcb,
     Prepare(req, timeout);
   });
 }
-
-void Client::Commit_batch(commit_callback_batch ccb, commit_timeout_callback ctcb,
-    uint32_t timeout, int commitTxNum) {}
 
 void Client::Prepare(PendingRequest *req, uint32_t timeout) {
   Debug("PREPARE [%lu] at %lu.%lu", t_id, req->prepareTimestamp.getTimestamp(),

@@ -85,26 +85,14 @@ class Client : public ::Client {
   virtual void Get(const std::string &key, get_callback gcb,
       get_timeout_callback gtcb, uint32_t timeout = GET_TIMEOUT) override;
 
-  //追加
-  virtual void Get_batch(const std::vector<std::string>& key_list, std::vector<get_callback>& gcb_list, std::multimap<std::string, int> *keyTxMap, 
-      get_timeout_callback_batch gtcb, uint32_t timeout = GET_TIMEOUT) override;
-
   // Set the value for the given key.
   virtual void Put(const std::string &key, const std::string &value,
       put_callback pcb, put_timeout_callback ptcb,
       uint32_t timeout = PUT_TIMEOUT) override;
 
-  virtual void Put_batch(const std::string &key, const std::string &value,
-      put_callback pcb, put_timeout_callback ptcb,
-      int batch_num, uint32_t timeout = PUT_TIMEOUT) override;
-
   // Commit all Get(s) and Put(s) since Begin().
   virtual void Commit(commit_callback ccb, commit_timeout_callback ctcb,
       uint32_t timeout) override;
-
-  // Commit all Get(s) and Put(s) since Begin().
-  virtual void Commit_batch(commit_callback_batch ccb, commit_timeout_callback ctcb,
-      uint32_t timeout, int batch_size_at_commit) override;
 
   // Abort all Get(s) and Put(s) since Begin().
   virtual void Abort(abort_callback acb, abort_timeout_callback atcb,
@@ -185,8 +173,6 @@ class Client : public ::Client {
 
   void Phase1(PendingRequest *req);
 
-  void Phase1_batch(std::vector<PendingRequest *>& requests);
-
   void Phase1Callback(uint64_t reqId, int group, proto::CommitDecision decision,
       bool fast, bool conflict_flag, const proto::CommittedProof &conflict,
       const std::map<proto::ConcurrencyControl::Result,
@@ -203,7 +189,6 @@ class Client : public ::Client {
   void HandleAllPhase1Received(PendingRequest *req);
 
   void Phase2(PendingRequest *req);
-  void Phase2_batch(PendingRequest *req);
   void Phase2Processing(PendingRequest *req);
   void Phase2SimulateEquivocation(PendingRequest *req);
   void Phase2Equivocate(PendingRequest *req);
@@ -213,7 +198,6 @@ class Client : public ::Client {
   void Phase2TimeoutCallback(int group, uint64_t reqId, int status);
   void WritebackProcessing(PendingRequest *req);
   void Writeback(PendingRequest *req);
-  void Writeback_batch(PendingRequest *req);
   void FailureCleanUp(PendingRequest *req);
   void ForwardWBcallback(uint64_t txnId, int group, proto::ForwardWriteback &forwardWB);
 
@@ -260,8 +244,6 @@ class Client : public ::Client {
 
 
   bool IsParticipant(int g) const;
-
-  bool IsParticipant_batch(int g) const;
 
   /* Configuration State */
   transport::Configuration *config;
@@ -310,7 +292,6 @@ class Client : public ::Client {
   proto::Transaction txnBatch[MAX_TRANSACTION_SIZE];
   std::vector<read_callback> rcb_list;
   std::vector<TimestampMessage> timestamp_list;
-  std::vector<phase1_callback> phase1_callback_batch;
   std::vector<phase1_timeout_callback> phase1_timeout_callback_batch;
   std::vector<relayP1_callback> relayP1_callback_batch;
   std::vector<finishConflictCB> finishConflictCB_batch;

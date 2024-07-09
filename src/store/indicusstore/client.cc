@@ -261,85 +261,6 @@ void Client::Get(const std::string &key, get_callback gcb,
   });
 }
 
-void Client::Get_batch(const std::vector<std::string>& key_list, std::vector<get_callback>& gcb_list, std::multimap<std::string, int> *keyTxMap,
-    get_timeout_callback_batch gtcb, uint32_t timeout) {  
-  
-  transport->Timer(0, [this, key_list, gcb_list, keyTxMap, gtcb, timeout]() {
-
-    int numRead = key_list.size();
-    // Latency_Start(&getLatency);
-    /*
-    for(int i = 0; i < numRead; i++){
-      auto itr = (*keyTxMap).find(key_list[i]);
-      Debug("GET_BATCH : GET[%lu:%lu] for key %s", client_id, client_seq_num + itr->second,
-        BytesToHex(key_list[i], 16).c_str());
-    }
-    */
-
-    // Contact the appropriate shard to get the value.
-    std::vector<int> txnGroups(txn.involved_groups().begin(), txn.involved_groups().end());
-    int id = (*part)(key_list[0], nshards, -1, txnGroups) % ngroups;
-    // If needed, add this shard to set of participants and send BEGIN.
-    if (!IsParticipant(id)) {
-      txn.add_involved_groups(id);
-      bclient[id]->Begin(client_seq_num);
-    }
-    Debug("Get_batch : txn.involved_groups_size() :%d", txn.involved_groups_size());
-    
-    //初期化
-    rcb_list.clear();
-    timestamp_list.clear();
-
-    Debug("numRead : %d", numRead);
-
-    for (int i = 0; i < numRead; i++){
-      get_callback gcb = gcb_list[i];
-
-      read_callback rcb = [gcb, this, i, keyTxMap](int status, const std::string &key,
-        const std::string &val, const Timestamp &ts, const proto::Dependency &dep,
-        bool hasDep, bool addReadSet){
-
-        uint64_t ns = 0; //Latency_End(&getLatency);
-        if (Message_DebugEnabled(__FILE__)) {
-          auto itr = (*keyTxMap).find(key);
-          Debug("GET[%lu:%lu] Callback for key %s with %lu bytes and ts %lu.%lu after %luus.",
-              client_id, client_seq_num + itr->second, BytesToHex(key, 16).c_str(), val.length(),
-              ts.getTimestamp(), ts.getID(), ns / 1000);
-          if (hasDep) {
-            Debug("GET[%lu:%lu] Callback for key %s with dep ts %lu.%lu.",
-                client_id, client_seq_num + itr->second, BytesToHex(key, 16).c_str(),
-                dep.write().prepared_timestamp().timestamp(),
-                dep.write().prepared_timestamp().id());
-          }
-        }
-        
-        Debug("key : %s \n", key.c_str());
-
-        if (addReadSet) {
-          ReadMessage *read = txn.add_read_set();
-          read->set_key(key);
-          ts.serialize(read->mutable_readtime());
-        }
-        if (hasDep) {
-          *txn.add_deps() = dep;
-        }
-        gcb(status, key, val, ts);  
-      };
-
-      rcb_list.push_back(rcb);
-      
-      timestamp_list.push_back(txn.timestamp());
-    }
-
-    read_timeout_callback_batch rtcb = gtcb;
-    
-    // Send the GET operation to appropriate shard.
-    bclient[id]->Get_batch(client_seq_num, key_list, timestamp_list, readMessages,
-        readQuorumSize, params.readDepSize, rcb_list, rtcb, timeout);
-  });
-}
-
-
 void Client::Put(const std::string &key, const std::string &value,
     put_callback pcb, put_timeout_callback ptcb, uint32_t timeout) {
   
@@ -365,37 +286,6 @@ void Client::Put(const std::string &key, const std::string &value,
     // ローカルでバッファリングする。
     // Buffering, so no need to wait.
     bclient[i]->Put(client_seq_num, key, value, pcb, ptcb, timeout);
-  });
-  
-}
-
-void Client::Put_batch(const std::string &key, const std::string &value,
-    put_callback pcb, put_timeout_callback ptcb, int batch_num, uint32_t timeout) {
-
-  Debug("indicus::put_batch \n");
-  
-  transport->Timer(0, [this, key, value, pcb, ptcb, timeout]() {
-    //std::cerr << "value size: " << value.size() << "; key " << BytesToHex(key,16).c_str() << std::endl;
-    Debug("PUT[%lu:%lu] for key %s", client_id, client_seq_num, BytesToHex(key,
-          16).c_str());
-
-    // Contact the appropriate shard to set the value.
-    std::vector<int> txnGroups(txn.involved_groups().begin(), txn.involved_groups().end());
-    int id = (*part)(key, nshards, -1, txnGroups) % ngroups;
-
-    // If needed, add this shard to set of participants and send BEGIN.
-    if (!IsParticipant(id)) {
-      txn.add_involved_groups(id);
-      bclient[id]->Begin(client_seq_num);
-    }
-
-    WriteMessage *write = txn.add_write_set();
-    write->set_key(key);
-    write->set_value(value);
-
-    // ローカルでバッファリングする。
-    // Buffering, so no need to wait.
-    bclient[id]->Put(client_seq_num, key, value, pcb, ptcb, timeout);
   });
   
 }
@@ -426,39 +316,6 @@ void Client::Commit(commit_callback cc, commit_timeout_callback ctcb,
     Phase1(req);
   });
   
-}
-
-void Client::Commit_batch(commit_callback_batch ccb, commit_timeout_callback ctcb,
-    uint32_t timeout, int commitTxNum) {
-  
-  Debug("Client::Commit_batch is called\n");
-      
-  transport->Timer(0, [this, ccb, ctcb, timeout, commitTxNum]() {
-    uint64_t ns = Latency_End(&executeLatency);
-    //Latency_Start(&commitLatency);
-    std::vector<PendingRequest *> requests;
-
-    Debug("commitTxNum:%d\n",commitTxNum);
-
-    for(int i = 0; i < commitTxNum; i++){
-      //XXX flag to sort read/write sets for parallel OCC
-      if(params.parallel_CCC){
-        std::sort(txnBatch[i].mutable_read_set()->begin(), txnBatch[i].mutable_read_set()->end(), sortReadByKey);
-        std::sort(txnBatch[i].mutable_write_set()->begin(), txnBatch[i].mutable_write_set()->end(), sortWriteByKey);
-      }
-      requests.push_back(new PendingRequest(client_seq_num + i, this));
-      pendingReqs[client_seq_num + i] = requests[i];
-      requests[i]->txn = txnBatch[i]; //Is this a copy or just reference?
-      requests[i]->ccb = ccb;
-      requests[i]->ctcb = ctcb;
-      requests[i]->callbackInvoked = false;
-      requests[i]->txnDigest = TransactionDigest(txnBatch[i], params.hashDigest);
-      requests[i]->timeout = timeout; //20000UL; //timeout;
-      stats.IncrementList("txn_groups", txn.involved_groups().size());
-      Debug("requests[i]->id: %d\n",requests[i]->id);
-    }
-    Phase1_batch(requests);
-  });
 }
 
 void Client::Phase1(PendingRequest *req) {
@@ -496,63 +353,6 @@ void Client::Phase1(PendingRequest *req) {
     return;
   }
 }
-
-void Client::Phase1_batch(std::vector<PendingRequest *>& requests) {
-
-  Debug("Client::Phase1_batch is called\n");
-
-  phase1_callback_batch.clear();
-  phase1_timeout_callback_batch.clear();
-  relayP1_callback_batch.clear();
-  finishConflictCB_batch.clear();
-
-  std::vector<std::string> txnDigests;
-
-  UW_ASSERT(txnBatch[0].involved_groups().size() > 0);
-
-  for (int i = 0; i < requests.size(); i++){
-    Debug("PHASE1 Batch[%lu:%lu] for txn_id %s at TS %lu", client_id, client_seq_num + i,
-      BytesToHex(TransactionDigest(requests[i]->txn, params.hashDigest), 16).c_str(), txnBatch[i].timestamp().timestamp());
-    txnDigests.push_back(requests[i]->txnDigest);
-
-    for (auto group : txnBatch[0].involved_groups()) {
-      phase1_callback_batch.push_back(std::bind(&Client::Phase1Callback, this, requests[i]->id, group, std::placeholders::_1,
-          std::placeholders::_2, std::placeholders::_3,
-          std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
-      phase1_timeout_callback_batch.push_back(std::bind(&Client::Phase1TimeoutCallback, this, group, requests[i]->id,
-          std::placeholders::_1));
-      relayP1_callback_batch.push_back(std::bind(&Client::RelayP1callback, this, requests[i]->id, std::placeholders::_1, std::placeholders::_2));
-      finishConflictCB_batch.push_back(std::bind(&Client::FinishConflict, this, requests[i]->id, std::placeholders::_1, std::placeholders::_2));
-    }
-  }
-
-  for (auto group : txnBatch[0].involved_groups()) {
-    bclient[group]->Phase1_batch(client_seq_num, txnBatch, txnDigests,
-        phase1_callback_batch, phase1_timeout_callback_batch, relayP1_callback_batch,
-        finishConflictCB_batch, requests[0]->timeout);
-    for(int i = 0; i < requests.size(); i++){
-      requests[i]->outstandingPhase1s++;
-    }
-  }
-
-  //schedule timeout for when we allow starting FB P1.
-  for (int i = 0; i < requests.size(); i++){
-    transport->Timer(params.relayP1_timeout, [this, reqId = requests[i]->id](){RelayP1TimeoutCallback(reqId);});
-    if(!failureEnabled) stats.Increment("total_honest_p1_started", 1);
-    //FAIL right after sending P1
-    if (failureActive && (params.injectFailure.type == InjectFailureType::CLIENT_CRASH || params.injectFailure.type == InjectFailureType::CLIENT_SEND_PARTIAL_P1)) {
-      Debug("INJECT CRASH FAILURE[%lu:%lu] with decision %d. txnDigest: %s", client_id, requests[i]->id, requests[i]->decision,
-            BytesToHex(TransactionDigest(requests[i]->txn, params.hashDigest), 16).c_str());
-      stats.Increment("inject_failure_crash");
-      //total_failure_injections++;
-      FailureCleanUp(requests[i]);
-      return;
-    }
-  }
-}
-
-
-
 
 void Client::Phase1CallbackProcessing(PendingRequest *req, int group,
     proto::CommitDecision decision, bool fast, bool conflict_flag,
@@ -777,32 +577,6 @@ void Client::Phase2(PendingRequest *req) {
   Phase2Processing(req);
 
   bclient[logGroup]->Phase2(client_seq_num, txn, req->txnDigest, req->decision,
-      req->p1ReplySigsGrouped,
-      std::bind(&Client::Phase2Callback, this, req->id, logGroup,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
-      std::bind(&Client::Phase2TimeoutCallback, this, logGroup, req->id,
-        std::placeholders::_1), req->timeout);
-
-    //XXX use StopP1 to shortcircuit all shard clients
-  // for(auto group : req->txn.involved_groups()){
-  //     bclient[group]->StopP1(req->id);
-  // }
-}
-
-void Client::Phase2_batch(PendingRequest *req) {
-
-  Debug("phase2 start");
-
-  //txnがおかしいはず
-
-  int64_t logGroup = GetLogGroup(txnBatch[0], req->txnDigest);
-
-  Debug("PHASE2[%lu:%lu][%s] logging to group %ld", client_id, client_seq_num,
-      BytesToHex(req->txnDigest, 16).c_str(), logGroup);
-
-  Phase2Processing(req);
-
-  bclient[logGroup]->Phase2_batch(client_seq_num, txnBatch[0], req->txnDigest, req->decision,
       req->p1ReplySigsGrouped,
       std::bind(&Client::Phase2Callback, this, req->id, logGroup,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
@@ -1043,96 +817,8 @@ void Client::Writeback(PendingRequest *req) {
 
 }
 
-void Client::Writeback_batch(PendingRequest *req) {
-
-  //total_writebacks++;
-  Debug("WRITEBACK[%lu:%lu] result %s", client_id, req->id, req->decision ?  "ABORT" : "COMMIT");
-  req->startedWriteback = true;
-
-  if (failureActive && params.injectFailure.type == InjectFailureType::CLIENT_STALL_AFTER_P1) {
-    Debug("INJECT CRASH FAILURE[%lu:%lu] with decision %d. txnDigest: %s", client_id, req->id, req->decision,
-          BytesToHex(TransactionDigest(req->txn, params.hashDigest), 16).c_str());
-    stats.Increment("inject_stall_after_p1", 1);
-    //stats.Increment("total_stall_after_p1");
-    //total_failure_injections++;
-    FailureCleanUp(req);
-    return;
-  }
-
-
-  transaction_status_t result;
-  switch (req->decision) {
-    case proto::COMMIT: {
-      Debug("WRITEBACK[%lu:%lu][%s] COMMIT.", client_id, req->id,
-          BytesToHex(req->txnDigest, 16).c_str());
-      result = COMMITTED;
-      break;
-    }
-    case proto::ABORT: {
-      result = ABORTED_SYSTEM;
-      Debug("WRITEBACK[%lu:%lu][%s] ABORT.", client_id, req->id,
-          BytesToHex(req->txnDigest, 16).c_str());
-      break;
-    }
-    default: {
-      NOT_REACHABLE();
-    }
-  }
-  //this function truncates sigs for the Abort p1 fast case
-  WritebackProcessing(req);
-
-  for (auto group : txnBatch[0].involved_groups()) {
-    bclient[group]->Writeback_batch(client_seq_num, txnBatch[0], req->txnDigest,
-      req->decision, req->fast, req->conflict_flag, req->conflict, req->p1ReplySigsGrouped,
-      req->p2ReplySigsGrouped, req->decision_view);
-  }
-  
-  if (!req->callbackInvoked) {
-    //uint64_t ns = Latency_End(&commitLatency);
-    //For Failures (byz clients), do not count any commits in order to isolate honest throughput.
-    if(failureEnabled && result == COMMITTED){ //--> breaks overall tput???
-      //stats.Increment("total_user_abort_orig_commit", 1);
-      stats.Increment("total_commit_byz", 1);
-      result = ABORTED_USER;
-    }
-    else if(!failureEnabled && result == COMMITTED){
-      Debug("total_commit_honest");
-      stats.Increment("total_commit_honest", 1);
-    }
-    if(failureEnabled && result == ABORTED_SYSTEM){ //--> breaks overall tput???
-      stats.Increment("total_abort_byz", 1);
-      //stats.Increment("total_user_abort_orig_abort", 1);
-      //result = ABORTED_USER;
-    }
-    else if(!failureEnabled && result == ABORTED_SYSTEM){ //--> breaks overall tput???
-      stats.Increment("total_abort_honest", 1);
-      //result = ABORTED_USER;
-    }
-    //ここでcommit_callbackを呼び出している。
-    req->ccb(result, req->id);
-    req->callbackInvoked = true;
-  }
-  //XXX use StopP1 to shortcircuit all shard clients
-  // for(auto group : req->txn.involved_groups()){
-  //   bclient[group]->StopP1(req->id);
-  // }
-
-  this->pendingReqs.erase(req->id);
-  delete req;
-
-}
-
 bool Client::IsParticipant(int g) const {
   for (const auto &participant : txn.involved_groups()) {
-    if (participant == g) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool Client::IsParticipant_batch(int g) const {
-  for (const auto &participant : txnBatch[0].involved_groups()) {
     if (participant == g) {
       return true;
     }

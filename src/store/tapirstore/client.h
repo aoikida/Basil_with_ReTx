@@ -72,25 +72,14 @@ class Client : public ::Client {
   virtual void Get(const std::string &key, get_callback gcb,
       get_timeout_callback gtcb, uint32_t timeout = GET_TIMEOUT) override;
 
-  virtual void Get_batch(const std::vector<std::string> &key_list, std::vector<get_callback> &gcb_list, std::multimap<std::string, int> *keyTxMap,
-      get_timeout_callback_batch gtcb, uint32_t timeout = GET_TIMEOUT) override;
-
   // Set the value for the given key.
   virtual void Put(const std::string &key, const std::string &value,
       put_callback pcb, put_timeout_callback ptcb,
       uint32_t timeout = PUT_TIMEOUT) override;
 
-  virtual void Put_batch(const std::string &key, const std::string &value,
-      put_callback pcb, put_timeout_callback ptcb,
-      int batch_num, uint32_t timeout = PUT_TIMEOUT) override;
-
   // Commit all Get(s) and Put(s) since Begin().
   virtual void Commit(commit_callback ccb, commit_timeout_callback ctcb,
       uint32_t timeout) override;
-
-  // Commit all Get(s) and Put(s) since Begin().
-  virtual void Commit_batch(commit_callback_batch ccb, commit_timeout_callback ctcb,
-      uint32_t timeout, int batch_size_at_commit) override;
 
   // Abort all Get(s) and Put(s) since Begin().
   virtual void Abort(abort_callback acb, abort_timeout_callback atcb,
