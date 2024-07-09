@@ -29,37 +29,33 @@
 
 namespace rw {
 
-RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, bool readOnly, 
-std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readOnly(readOnly){
-  for (int i = 0; i < numOps; ++i) {
-    uint64_t key;
-    if (i % 2 == 0) {
-      key = keySelector->GetKey(rand);
-    } else {
-      key = keyIdxs[i - 1];
+RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, std::mt19937 &rand, bool batchOptimization, int batchSize)
+ : keySelector(keySelector), numOps(numOps), batchOptimization(batchOptimization), batchSize(batchSize){
+  if (!batchOptimization){
+    for (int i = 0; i < numOps; ++i) {
+      uint64_t key;
+      if (i % 2 == 0) {
+        key = keySelector->GetKey(rand);
+      } else {
+        key = keyIdxs[i - 1];
+      }
+      std::cout << "key:" << key << std::endl;
+      keyIdxs.push_back(key);
     }
-    std::cout << "key:" << key << std::endl;
-    keyIdxs.push_back(key);
+  }
+  else {
+    for (int i = 0; i < numOps * batchSize; ++i) {
+      uint64_t key;
+      if (i % 2 == 0) {
+        key = keySelector->GetKey(rand);
+      } else {
+        key = keyIdxs[i - 1];
+      }
+      std::cout << "key:" << key << std::endl;
+      keyIdxs.push_back(key);
+    }
   }
 }
-
-/*
-RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, bool readOnly, 
-std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readOnly(readOnly){
-  // バッチ用に改変
-  // readの後にwriteを行うというベンチマークで、それそれ同じキーを処理する。
-  int batchSize = 2;
-  for (int i = 0; i < numOps * batchSize; ++i) {
-    uint64_t key;
-    if (i % 2 == 0) {
-      key = keySelector->GetKey(rand);
-    } else {
-      key = keyIdxs[i - 1];
-    }
-    keyIdxs.push_back(key);
-  }
-}
-*/
 
 RWTransaction::~RWTransaction() {
 }

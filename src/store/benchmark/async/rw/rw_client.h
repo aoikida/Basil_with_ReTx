@@ -45,7 +45,7 @@ class RWClient : public AsyncTransactionBenchClient {
       Transport &transport, uint64_t id, int numRequests, int expDuration,
       uint64_t delay, int warmupSec, int cooldownSec, int tputInterval,
       uint32_t abortBackoff, bool retryAborted, uint32_t maxBackoff, uint32_t maxAttempts,
-      int32_t batchSize, const std::string &latencyFilename = "");
+      bool batchOptimization, int32_t batchSize, const std::string &latencyFilename = "");
 
 
   virtual ~RWClient();
@@ -60,8 +60,9 @@ class RWClient : public AsyncTransactionBenchClient {
   KeySelector *keySelector;
   uint64_t numKeys;
   uint64_t tid = 0;
-  bool readOnly;
+  bool readOnly = false;
   int32_t batchSize;
+  bool batchOptimization;
 
 };
 

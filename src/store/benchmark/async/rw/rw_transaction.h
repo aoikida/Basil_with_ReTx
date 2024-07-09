@@ -37,7 +37,7 @@ namespace rw {
 
 class RWTransaction : public AsyncTransaction {
  public:
-  RWTransaction(KeySelector *keySelector, int numOps, bool readOnly, std::mt19937 &rand);
+  RWTransaction(KeySelector *keySelector, int numOps, std::mt19937 &rand, bool batchOptimization, int batchSize);
   virtual ~RWTransaction();
 
   virtual Operation GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
@@ -59,8 +59,10 @@ class RWTransaction : public AsyncTransaction {
 
  private:
   const size_t numOps;
-  const bool readOnly;
+  bool readOnly;
   std::vector<int> keyIdxs;
+  bool batchOptimization;
+  size_t batchSize;
   std::vector<Operation> read_set;
   std::vector<Operation> pre_read_set;
   std::vector<Operation> write_set;

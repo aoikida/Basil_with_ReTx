@@ -1099,7 +1099,7 @@ int main(int argc, char **argv) {
             FLAGS_num_requests, FLAGS_exp_duration, FLAGS_delay,
             FLAGS_warmup_secs, FLAGS_cooldown_secs, FLAGS_tput_interval,
             FLAGS_abort_backoff, FLAGS_retry_aborted, FLAGS_max_backoff,
-            FLAGS_max_attempts, FLAGS_indicus_batch_size);
+            FLAGS_max_attempts, FLAGS_batch_optimization, FLAGS_indicus_batch_size);
         break;
       case BENCH_YCSB:
         UW_ASSERT(asyncClient != nullptr);
