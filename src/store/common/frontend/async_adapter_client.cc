@@ -60,7 +60,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   int tx_num = 0;
   bool tx_conflict_finish = false;
   bool op_conflict_finish = false;
-  int thisTxWrite = 0;
   int OpCount = 0;
   bool duplicate = false;
   batch_size = batchSize;
@@ -132,7 +131,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
           }
           if (duplicate == true){
-            Debug("read key is duplicated, so skip following steps");
+            Debug("write key is duplicated, so skip following steps");
             duplicate = false;
             continue;
           }
@@ -174,7 +173,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
         write_set.push_back(*itr);
         keyTxMap.insert(std::make_pair((*itr).key, tx_num));
         writeOpNum++;
-        thisTxWrite++;
       }
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
       pre_write_set.clear();
@@ -211,21 +209,22 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
           }
           if (duplicate == true){
+            Debug("read key is duplicated, so skip following steps");
             duplicate = false;
             continue;
           }
           for(auto itr = write_set.begin(); itr != write_set.end(); ++itr){
             if ((*itr).key == op.key){
-              //バッチをこのトランザクションを除いて作成する
-              Debug("conflict occur");
+              Debug("write-read conflict with other transaction");
               tx_conflict_finish = true;
             }
             break;
           }
           for (auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
             if ((*itr).key == op.key){
-              Debug("conflict occur in same transaction");
+              Debug("write-read dependency in same transaction");
               if (readwrite == true){
+                Debug("read-write dependency and write-read dependency in same transaction");
                 op_conflict_finish = true;
               }
               else {
@@ -246,19 +245,22 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
           }
           if (duplicate == true){
+            Debug("write key is duplicated, so skip following steps");
             duplicate = false;
             continue;
           }
           for(auto itr = read_set.begin(); itr != read_set.end(); ++itr){
             if ((*itr).key == op.key){
+              Debug("write-read conflict with other transaction");
               tx_conflict_finish = true;
             }
             break;
           }
           for (auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
             if ((*itr).key == op.key){
-              Debug("conflict occur in same transaction");
+               Debug("read-write dependency in same transaction");
               if (writeread == true){
+                Debug("read-write dependency and write-read dependency in same transaction");
                 op_conflict_finish = true;
               }
               else {
@@ -284,15 +286,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
         write_set.push_back(*itr);
         keyTxMap.insert(std::make_pair((*itr).key, tx_num));
         writeOpNum++;
-        thisTxWrite++;
       }
-
-      /*
-      if (thisTxWrite != 0){
-        ExecuteWriteOperation();
-        thisTxWrite == 0;
-      }
-      */
 
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
 
