@@ -79,7 +79,6 @@ class AsyncAdapterClient : public AsyncClient {
 
   //追加
   std::vector<Operation> transaction;
-  std::map<int, std::vector<Operation>> batch;
   std::vector<Operation> read_set;
   std::vector<Operation> pre_read_set;
   std::vector<Operation> write_set;

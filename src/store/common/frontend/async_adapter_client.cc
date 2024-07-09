@@ -174,7 +174,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
       pre_write_set.clear();
       pre_read_set.clear();
-      batch.insert(std::make_pair(txNum + tx_num, transaction));
       transaction.clear();
       tx_num++;
       commitTxNum++;
@@ -287,7 +286,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
 
       pre_write_set.clear();
       pre_read_set.clear();
-      batch.insert(std::make_pair(txNum + tx_num, transaction));
       transaction.clear();
       tx_num++;
       commitTxNum++;
