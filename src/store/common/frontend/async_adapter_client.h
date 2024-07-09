@@ -60,7 +60,6 @@ class AsyncAdapterClient : public AsyncClient {
   void ExecuteCommit();
   int writeOpNum = 0;
   int readOpNum = 0;
-  int commitTxNum = 0;
   int putCbCount = 0;
   int getCbCount = 0;
   int commitCbCount = 0;

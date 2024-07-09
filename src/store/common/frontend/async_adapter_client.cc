@@ -71,7 +71,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   readOpNum = 0;
   write_set.clear();
   writeOpNum = 0;
-  commitTxNum = 0;
   txNum_writeSet.clear();
   writeread = false;
   readwrite = false;
@@ -176,7 +175,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
       pre_read_set.clear();
       transaction.clear();
       tx_num++;
-      commitTxNum++;
       abort_set.erase(tx);
     }
     else {
@@ -288,7 +286,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
       pre_read_set.clear();
       transaction.clear();
       tx_num++;
-      commitTxNum++;
     }
     else {
       abort_set.push_back(transaction);
@@ -341,8 +338,6 @@ void AsyncAdapterClient::ExecuteReadOperation(){
 
 
 void AsyncAdapterClient::ExecuteCommit(){
-
-  Debug("commitTxNum: %d\n", commitTxNum);
 
   client->Commit(std::bind(&AsyncAdapterClient::CommitBigCallback, this,
         std::placeholders::_1), std::bind(&AsyncAdapterClient::CommitTimeout,
