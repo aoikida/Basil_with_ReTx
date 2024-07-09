@@ -67,7 +67,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
 
   //前回のバッチで使用した変数を初期化
   transaction.clear();
-  keyTxMap.clear(); //get_batchにおいて、keyからtxのidを割り出すために使用
   read_set.clear(); 
   readOpNum = 0;
   write_set.clear();
@@ -166,12 +165,10 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
       for(auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
         readValues.insert(std::make_pair((*itr).key, ""));
         read_set.push_back(*itr);
-        keyTxMap.insert(std::make_pair((*itr).key, tx_num));
         readOpNum++;
       }
       for(auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
         write_set.push_back(*itr);
-        keyTxMap.insert(std::make_pair((*itr).key, tx_num));
         writeOpNum++;
       }
       txNum_writeSet.push_back(std::make_pair(tx_num, pre_write_set));
@@ -279,12 +276,10 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
       for(auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
         readValues.insert(std::make_pair((*itr).key, ""));
         read_set.push_back(*itr);
-        keyTxMap.insert(std::make_pair((*itr).key, tx_num));
         readOpNum++;
       }
       for(auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
         write_set.push_back(*itr);
-        keyTxMap.insert(std::make_pair((*itr).key, tx_num));
         writeOpNum++;
       }
 
