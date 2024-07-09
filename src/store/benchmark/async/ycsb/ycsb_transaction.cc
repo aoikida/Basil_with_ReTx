@@ -29,11 +29,20 @@
 namespace ycsb {
 
 YCSBTransaction::YCSBTransaction(KeySelector *keySelector, int numOps, int readRatio, 
-std::mt19937 &rand) : keySelector(keySelector), numOps(numOps), readRatio(readRatio){
-  for (int i = 0; i < numOps; ++i) {
-    uint64_t key = keySelector->GetKey(rand);
-    std::cout << "key:" << key << std::endl;
-    keyIdxs.push_back(key);
+std::mt19937 &rand, bool batchOptimization, int batchSize) : keySelector(keySelector), numOps(numOps), readRatio(readRatio), batchOptimization(batchOptimization), batchSize(batchSize){
+  if (!batchOptimization){
+    for (int i = 0; i < numOps; ++i) {
+      uint64_t key = keySelector->GetKey(rand);
+      std::cout << "key:" << key << std::endl;
+      keyIdxs.push_back(key);
+    }
+  }
+  else {
+    for (int i = 0; i < numOps * batchSize; ++i) {
+      uint64_t key = keySelector->GetKey(rand);
+      std::cout << "key:" << key << std::endl;
+      keyIdxs.push_back(key);
+    }
   }
 }
 

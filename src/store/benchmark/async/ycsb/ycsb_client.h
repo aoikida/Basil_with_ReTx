@@ -43,7 +43,7 @@ class YCSBClient : public AsyncTransactionBenchClient {
   YCSBClient(KeySelector *keySelector, uint64_t numKeys, bool readOnly, AsyncClient &client,
       Transport &transport, uint64_t id, int numRequests, int expDuration,
       uint64_t delay, int warmupSec, int cooldownSec, int tputInterval,
-      uint32_t abortBackoff, bool retryAborted, uint32_t maxBackoff, uint32_t maxAttempts,
+      uint32_t abortBackoff, bool retryAborted, uint32_t maxBackoff, uint32_t maxAttempts, bool batchOptimization,
       int32_t batchSize, int32_t readRatio, const std::string &latencyFilename = "");
 
 
@@ -60,6 +60,8 @@ class YCSBClient : public AsyncTransactionBenchClient {
   uint64_t numKeys;
   uint64_t tid = 0;
   int32_t readRatio;
+  bool batchOptimization;
+  int32_t batchSize;
 
 };
 

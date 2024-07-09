@@ -156,7 +156,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
           break;
         }
       }
-      OpCount++;
     }
 
     if (tx_conflict_finish == false && op_conflict_finish == false){
@@ -190,7 +189,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   while(tx_num < batchSize){
     Debug("tx_num: %d\n", tx_num);
     for (int op_num = 0; op_num < txSize; op_num++){
-      Operation op = currTxn->GetNextOperation_batch(OpCount, readValues);
+      Operation op = currTxn->GetNextOperation_batch(OpCount++, readValues);
       switch (op.type) {
         case GET: {
           pre_read_set.push_back(op);
@@ -265,7 +264,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
           break;
         }
       }
-      OpCount++;
     }
     if (tx_conflict_finish == false && op_conflict_finish == false){
       Debug("%d : transaction finish\n", tx_num);

@@ -33,19 +33,19 @@ YCSBClient::YCSBClient(KeySelector *keySelector, uint64_t numKeys, bool readOnly
     AsyncClient &client,
     Transport &transport, uint64_t id, int numRequests, int expDuration,
     uint64_t delay, int warmupSec, int cooldownSec, int tputInterval,
-    uint32_t abortBackoff, bool retryAborted, uint32_t maxBackoff, uint32_t maxAttempts,
+    uint32_t abortBackoff, bool retryAborted, uint32_t maxBackoff, uint32_t maxAttempts, bool batchOptimization,
     int32_t batchSize, int32_t readRatio, const std::string &latencyFilename)
     : AsyncTransactionBenchClient(client, transport, id, numRequests,
         expDuration, delay, warmupSec, cooldownSec, tputInterval, abortBackoff,
         retryAborted, maxBackoff, maxAttempts, latencyFilename), keySelector(keySelector),
-        readRatio(readRatio), numKeys(numKeys){
+        readRatio(readRatio), numKeys(numKeys), batchOptimization(batchOptimization), batchSize(batchSize){
 }
 
 YCSBClient::~YCSBClient() {
 }
 
 AsyncTransaction *YCSBClient::GetNextTransaction() {
-  YCSBTransaction *ycsb_tx = new YCSBTransaction(keySelector, numKeys, readRatio, GetRand());
+  YCSBTransaction *ycsb_tx = new YCSBTransaction(keySelector, numKeys, readRatio, GetRand(), batchOptimization, batchSize);
   // for(int key : rw_tx->getKeyIdxs()){
   //   //key_counts[key]++;
   //   stats.IncrementList("key distribution", key, 1);
