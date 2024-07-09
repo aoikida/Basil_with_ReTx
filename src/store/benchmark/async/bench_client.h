@@ -54,7 +54,6 @@ class BenchmarkClient {
   virtual void SendNext_batch() = 0;
   void IncrementSent(int result);
   void IncrementSentBig(int result, int abortSize);
-  void IncrementSent_batch(std::vector<transaction_status_t> results);
   inline bool IsFullyDone() { return done; }
 
   struct Latency_t latency;

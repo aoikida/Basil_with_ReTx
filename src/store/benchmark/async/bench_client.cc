@@ -296,59 +296,6 @@ void BenchmarkClient::IncrementSentBig(int result, int abortSize) {
   n++;
 }
 
-void BenchmarkClient::IncrementSent_batch(std::vector<transaction_status_t> results) {
-  int commit_num = 0;
-  if (started) {
-    Debug("IncrementSent is called \n");
-    int batchSize = results.size();
-    // record latency
-    if (!cooldownStarted) {
-      uint64_t ns = Latency_End(&latency);
-      // TODO: use standard definitions across all clients for success/commit and failure/abort
-      for(int i = 0; i < batchSize; i++){
-        if (results[i] == 0) { // only record result if success
-          Debug("commit_num++");
-          commit_num++;
-          struct timespec curr;
-          clock_gettime(CLOCK_MONOTONIC, &curr);
-          if (latencies.size() == 0UL) {
-            gettimeofday(&startMeasureTime, NULL);
-            startMeasureTime.tv_sec -= ns / 1000000000ULL;
-            startMeasureTime.tv_usec -= (ns % 1000000000ULL) / 1000ULL;
-            Debug("startMeasureTime : %d, %d \n", startMeasureTime.tv_sec, startMeasureTime.tv_usec);
-            //std::cout << "#start," << startMeasureTime.tv_sec << "," << startMeasureTime.tv_usec << std::endl;
-          }
-          uint64_t currNanos = curr.tv_sec * 1000000000ULL + curr.tv_nsec;
-          latencies.push_back(ns);
-        }
-      }
-      n += commit_num;
-    }
-
-    if (numRequests == -1) {
-      struct timeval currTime;
-      gettimeofday(&currTime, NULL);
-
-      struct timeval diff = timeval_sub(currTime, startTime);
-      if (diff.tv_sec >= expDuration - cooldownSec && !cooldownStarted) {
-        //diff.tv_sec() > expDuration(configで設定した時間) - cooldownSec()
-        Debug("Starting cooldown after %ld seconds.", diff.tv_sec);
-        Debug("expDuration : %ld", expDuration);
-        Debug("Cooldown time : %ld", cooldownSec);
-        Finish();
-      } else if (diff.tv_sec > expDuration) {
-        Debug("Finished cooldown after %ld seconds.", diff.tv_sec);
-        CooldownDone();
-      } else {
-        Debug("Not done after %ld seconds.", diff.tv_sec);
-      }
-    } else if (n >= numRequests){
-      CooldownDone();
-    }
-  }
-
-}
-
 void BenchmarkClient::Finish() {
   gettimeofday(&endTime, NULL);
 
