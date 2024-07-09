@@ -64,8 +64,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   bool duplicate = false;
   batch_size = batchSize;
   
-
-  //前回のバッチで使用した変数を初期化
+  //Initialize
   transaction.clear();
   read_set.clear(); 
   readOpNum = 0;
@@ -75,6 +74,8 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   readwrite = false;
 
   //問題点: op_conflict_finishは, ずっとabortされ続ける。絶対にcommitできない.
+
+  Debug("ReconstructTransaction: txNum: %d, txSize: %d, batchSize: %d\n", txNum, txSize, batchSize);
 
   //前回のバッチに入れなかったトランザクションを再度バッチに入れる
   for (auto tx = abort_set.begin(); tx != abort_set.end(); ++tx){
@@ -297,11 +298,9 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
     ExecuteReadOperation();
   }
   else if (readwrite == true){
-    //readを先に行う
     ExecuteReadOperation();
   }
-  else{
-    //writeを先に行う // 通常
+  else{ //Basically
     writeread = true;
     ExecuteWriteOperation();
   }
@@ -401,7 +400,7 @@ void AsyncAdapterClient::GetCallback(int status, const std::string &key,
 
 void AsyncAdapterClient::GetCallback_batch(int status, const std::string &key,
     const std::string &val, Timestamp ts) {
-  Debug("Get(%s) callback.", key.c_str());
+  Debug("Get(%s) callback batch", key.c_str());
   readValues.insert(std::make_pair(key, val));
   getCbCount++;
   if (readOpNum <= getCbCount){
@@ -432,7 +431,7 @@ void AsyncAdapterClient::PutCallback(int status, const std::string &key,
 
 void AsyncAdapterClient::PutCallback_batch(int status, const std::string &key,
     const std::string &val){
-    Debug("Put(%s,%s) callback.", key.c_str(), val.c_str());
+    Debug("Put(%s,%s) callback batch.", key.c_str(), val.c_str());
     putCbCount++;
     if (writeOpNum <= putCbCount){
       if (readOpNum != 0 && writeread){
@@ -457,8 +456,8 @@ void AsyncAdapterClient::CommitCallback(transaction_status_t result) {
 }
 
 void AsyncAdapterClient::CommitBigCallback(transaction_status_t result) {
-  Debug("Commit callback.");
-  //ここを変える
+  Debug("Commit Big callback.");
+  //Go to store/benchmark/async/async_transaction_bench_client.cc 
   currEcbcb(result, readValues, batch_size, abort_set.size());
 }
 
