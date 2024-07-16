@@ -56,5 +56,5 @@ Operation PostTweet::GetNextOperation(size_t outstandingOpCount, size_t finished
   }
 }
 
-Operation PostTweet::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues){}
+Operation PostTweet::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues){}
 } // namespace retwis

@@ -44,7 +44,7 @@ class AddUser : public RetwisTransaction {
   
   
   
-  Operation GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues);
+  Operation GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues);
 };
 
 } // namespace retwis

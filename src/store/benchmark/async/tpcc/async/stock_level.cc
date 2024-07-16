@@ -105,7 +105,7 @@ Operation AsyncStockLevel::GetNextOperation(size_t outstandingOpCount, size_t fi
 }
 
 
-Operation AsyncStockLevel::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
+Operation AsyncStockLevel::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues) {
   if (OpCount == 0) {
     Debug("STOCK_LEVEL");
     Debug("Warehouse: %u", w_id);

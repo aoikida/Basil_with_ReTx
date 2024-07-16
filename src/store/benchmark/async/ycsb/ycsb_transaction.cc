@@ -97,38 +97,45 @@ Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t fi
 }
 
 
-Operation YCSBTransaction::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
-  
+Operation YCSBTransaction::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues){
+  Debug("Number of operations: %d\n", numOps);
   Debug("Operation count: %d\n", OpCount);
-  if ((rand() % 100) < readRatio) {
-    std::cerr << "read: " << GetKey(OpCount) << std::endl;
-    return Get(GetKey(OpCount));
-  } 
-  else {
-      std::cerr << "write: " << GetKey(OpCount) << std::endl;
-      auto strValueItr = readValues.find(GetKey(OpCount));
+  if (OpCount < numOps) {
+    std::cerr << "outstanding: " << OpCount << "; num ops: " << numOps << std::endl;
+    if ((rand() % 100) < readRatio) {
+      std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+      return Get(GetKey(OpCount + TxCount * numOps));
+    } 
+    else {
+        std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+        auto strValueItr = readValues.find(GetKey(OpCount + TxCount * numOps));
 
-      std::string strValue;
-      if (strValueItr != readValues.end()) {
-          strValue = strValueItr->second;
-      } else {
-          strValue = "";
-      }
+        std::string strValue;
+        if (strValueItr != readValues.end()) {
+            strValue = strValueItr->second;
+        } else {
+            strValue = "";
+        }
 
-      std::string writeValue;
-      if (strValue.length() == 0) {
-          writeValue = std::string(100, '\0'); // make a longer string
-      } else {
-          uint64_t intValue = 0;
-          for (int i = 0; i < 100; ++i) {
-              intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
-          }
-          intValue++;
-          for (int i = 0; i < 100; ++i) {
-              writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
-          }
-      }
-      return Put(GetKey(OpCount), writeValue);
+        std::string writeValue;
+        if (strValue.length() == 0) {
+            writeValue = std::string(100, '\0'); // make a longer string
+        } else {
+            uint64_t intValue = 0;
+            for (int i = 0; i < 100; ++i) {
+                intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
+            }
+            intValue++;
+            for (int i = 0; i < 100; ++i) {
+                writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
+            }
+        }
+        return Put(GetKey(OpCount + TxCount * numOps), writeValue);
+    }
+  }
+  else if (OpCount == numOps) {
+    std::cerr << "commit" << std::endl;
+    return Commit();
   }
 }
 

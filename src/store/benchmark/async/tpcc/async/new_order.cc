@@ -212,7 +212,7 @@ Operation AsyncNewOrder::GetNextOperation(size_t outstandingOpCount, size_t fini
   }
 }
 
-Operation AsyncNewOrder::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
+Operation AsyncNewOrder::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues) {
   if (OpCount == 0) {
     Debug("Warehouse: %u", w_id);
     return Get(WarehouseRowKey(w_id));

@@ -50,7 +50,7 @@ Operation GetTimeline::GetNextOperation(size_t outstandingOpCount, size_t finish
 
 
 
-Operation GetTimeline::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues){}
+Operation GetTimeline::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues){}
 
 
 } // namespace retwis

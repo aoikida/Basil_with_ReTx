@@ -98,38 +98,35 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
 }
 
 
-Operation RWTransaction::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
-  
+Operation RWTransaction::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues) {
+  Debug("Number of operations: %d\n", numOps);
   Debug("Operation count: %d\n", OpCount);
-  if (OpCount % 2 == 0) {
-    std::cerr << "read: " << GetKey(OpCount) << std::endl;
-    return Get(GetKey(OpCount));
-  } 
-  else {
-      std::cerr << "write: " << GetKey(OpCount) << std::endl;
-      auto strValueItr = readValues.find(GetKey(OpCount));
-
-      std::string strValue;
-      if (strValueItr != readValues.end()) {
-          strValue = strValueItr->second;
-      } else {
-          strValue = "";
-      }
-
+  if (OpCount < numOps) {
+    if (readOnly || OpCount % 2 == 0) {
+      std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+      return Get(GetKey(OpCount + TxCount * numOps));
+    } else {
+      std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+      auto strValueItr = readValues.find(GetKey(OpCount + TxCount * numOps));
+      UW_ASSERT(strValueItr != readValues.end());
+      std::string strValue = strValueItr->second;
       std::string writeValue;
       if (strValue.length() == 0) {
-          writeValue = std::string(100, '\0'); // make a longer string
+        writeValue = std::string(100, '\0'); //make a longer string
       } else {
-          uint64_t intValue = 0;
-          for (int i = 0; i < 100; ++i) {
-              intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
-          }
-          intValue++;
-          for (int i = 0; i < 100; ++i) {
-              writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
-          }
+        uint64_t intValue = 0;
+        for (int i = 0; i < 100; ++i) {
+          intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
+        }
+        intValue++;
+        for (int i = 0; i < 100; ++i) {
+          writeValue += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
+        }
       }
-      return Put(GetKey(OpCount), writeValue);
+      return Put(GetKey(OpCount + TxCount * numOps), writeValue);
+    }
+  } else if (OpCount == numOps) {
+    return Commit();
   }
 }
 

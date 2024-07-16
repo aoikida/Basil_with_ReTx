@@ -51,7 +51,7 @@ Operation AddUser::GetNextOperation(size_t outstandingOpCount, size_t finishedOp
 
 
 
-Operation AddUser::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues){}
+Operation AddUser::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues){}
 
 } // namespace retwis
 

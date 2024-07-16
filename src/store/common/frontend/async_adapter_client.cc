@@ -188,8 +188,12 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
   //トランザクションを再構築する
   while(tx_num < batchSize){
     Debug("tx_num: %d\n", tx_num);
-    for (int op_num = 0; op_num < txSize; op_num++){
-      Operation op = currTxn->GetNextOperation_batch(OpCount++, readValues);
+    while (true) {
+      Operation op = currTxn->GetNextOperation_batch(OpCount++, tx_num, readValues);
+      if (op.type == COMMIT) {
+        OpCount = 0;
+        break;
+      }
       switch (op.type) {
         case GET: {
           pre_read_set.push_back(op);

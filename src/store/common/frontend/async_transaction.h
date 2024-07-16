@@ -43,7 +43,7 @@ class AsyncTransaction {
       const std::map<std::string, std::string> readValues) = 0;
   
 
-  virtual Operation GetNextOperation_batch(size_t OpCount, const std::map<std::string, std::string> readValues) = 0;
+  virtual Operation GetNextOperation_batch(size_t OpCount, size_t TxCount, const std::map<std::string, std::string> readValues) = 0;
   
 };
 

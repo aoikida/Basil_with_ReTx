@@ -127,7 +127,7 @@ Operation AsyncOrderStatus::GetNextOperation(size_t outstandingOpCount, size_t f
   }
 }
 
-Operation AsyncOrderStatus::GetNextOperation_batch(size_t OpCount, std::map<std::string, std::string> readValues) {
+Operation AsyncOrderStatus::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues) {
   if (OpCount == 0) {
     Debug("ORDER_STATUS");
     Debug("Warehouse: %u", c_w_id);
