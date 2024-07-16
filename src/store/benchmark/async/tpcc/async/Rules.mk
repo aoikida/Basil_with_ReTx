@@ -7,4 +7,4 @@ OBJ-async-tpcc-transaction := $(LIB-store-frontend) $(o)tpcc_transaction.o
 OBJ-async-tpcc-client := $(o)tpcc_client.o
 
 LIB-async-tpcc := $(OBJ-async-tpcc-client) $(OBJ-async-tpcc-transaction) \
-	$(o)new_order.o $(o)payment.o $(o)order_status.o $(o)stock_level.o
+	$(o)new_order.o $(o)payment.o $(o)order_status.o $(o)stock_level.o $(o)delivery.o

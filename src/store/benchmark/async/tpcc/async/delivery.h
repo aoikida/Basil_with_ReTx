@@ -34,16 +34,9 @@
 
 #include "store/benchmark/async/tpcc/delivery.h"
 #include "store/benchmark/async/tpcc/async/tpcc_transaction.h"
+#include "store/benchmark/async/tpcc/tpcc-proto.pb.h"
 
 namespace tpcc {
-
-enum DeliveryState {
-  DS_EARLIEST_NO = 0,
-  DS_NEW_ORDER,
-  DS_ORDER,
-  DS_ORDER_LINES,
-  DS_CUSTOMER
-};
 
 class AsyncDelivery : public AsyncTPCCTransaction, public Delivery {
  public:
@@ -57,8 +50,15 @@ class AsyncDelivery : public AsyncTPCCTransaction, public Delivery {
 
 
  private:
-  uint8_t currDId;
-  DeliveryState state;
+  uint32_t o_id;
+  OrderRow o_row;
+  uint32_t total_amount;
+
+  std::string ero_key;
+  std::string o_key;
+  std::string ol_key;
+  std::string c_key;
+
 };
 
 } // namespace tpcc

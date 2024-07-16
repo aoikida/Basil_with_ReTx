@@ -53,6 +53,7 @@ TPCCClient::~TPCCClient() {
 
 TPCCTransactionType TPCCClient::GetNextTransaction(uint32_t *wid,
     uint32_t *did, std::mt19937 &gen) {
+  std::cerr << "TPCCClient::GetNextTransaction" << std::endl;
   if (delivery && deliveryDId < 10) {
     deliveryDId++;
     *wid = deliveryWId;
@@ -72,12 +73,15 @@ TPCCTransactionType TPCCClient::GetNextTransaction(uint32_t *wid,
   }
   if (ttype < new_order_ratio) {
     lastOp = "new_order";
+    std::cerr << "new_order" << std::endl;
     return TXN_NEW_ORDER; //new NewOrder(wid, C_c_id, num_warehouses, gen);
   } else if (ttype < new_order_ratio + payment_ratio) {
     lastOp = "payment";
+    std::cerr << "payment" << std::endl;
     return TXN_PAYMENT; //new Payment(wid, C_c_last, C_c_id, num_warehouses, gen);
   } else if (ttype < new_order_ratio + payment_ratio + order_status_ratio) {
     lastOp = "order_status";
+    std::cerr << "order_status" << std::endl;
     return TXN_ORDER_STATUS; //new OrderStatus(wid, C_c_last, C_c_id, gen);
   } else if (ttype < new_order_ratio + payment_ratio + order_status_ratio
       + stock_level_ratio) {
@@ -87,6 +91,7 @@ TPCCTransactionType TPCCClient::GetNextTransaction(uint32_t *wid,
       *did = std::uniform_int_distribution<uint32_t>(1, 10)(gen);
     }
     lastOp = "stock_level";
+    std::cerr << "stock_level" << std::endl;
     return TXN_STOCK_LEVEL; //new StockLevel(wid, did, gen);
   } else {
     deliveryDId = 1;
@@ -94,6 +99,7 @@ TPCCTransactionType TPCCClient::GetNextTransaction(uint32_t *wid,
     *did = deliveryDId;
     delivery = true;
     lastOp = "delivery";
+    std::cerr << "delivery" << std::endl;
     return TXN_DELIVERY;
   }
 }

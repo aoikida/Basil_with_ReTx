@@ -32,6 +32,7 @@
 #include "store/benchmark/async/tpcc/async/payment.h"
 #include "store/benchmark/async/tpcc/async/order_status.h"
 #include "store/benchmark/async/tpcc/async/stock_level.h"
+#include "store/benchmark/async/tpcc/async/delivery.h"
 
 namespace tpcc {
 
@@ -70,7 +71,7 @@ AsyncTransaction* AsyncTPCCClient::GetNextTransaction() {
     case TXN_STOCK_LEVEL:
       return new AsyncStockLevel(wid, did, GetRand());
     case TXN_DELIVERY:
-      Panic("Async Delivery transaction not implemented.");
+      return new AsyncDelivery(wid, stockLevelDId, GetRand());
     default:
       NOT_REACHABLE();
   }
