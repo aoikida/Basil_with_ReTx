@@ -340,7 +340,6 @@ void AsyncAdapterClient::ExecuteCommit(){
 
 
 void AsyncAdapterClient::ExecuteNextOperation() {
-  Debug("AsyncAdapterClient::ExecuteNextOperation");
   //GetNextOperationはstore/benchmark/async/rw/rw_transaction.ccのGetNextOperationである。
   Operation op = currTxn->GetNextOperation(outstandingOpCount, finishedOpCount, readValues);
   switch (op.type) {

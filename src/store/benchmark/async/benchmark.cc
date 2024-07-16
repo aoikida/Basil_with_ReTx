@@ -139,7 +139,7 @@ DEFINE_bool(ping_replicas, false, "determine latency to replicas via pings");
 DEFINE_bool(tapir_sync_commit, true, "wait until commit phase completes before"
     " sending additional transactions (for TAPIR)");
 //追加
-DEFINE_bool(batch_optimization, true, "if true batch optimization, else if false no conventional.");
+DEFINE_bool(batch_optimization, false, "if true batch optimization, else if false no conventional.");
 DEFINE_bool(signature_batch, false, "if true signature_batch, else if false no conventional.");
 
 //rw setting
@@ -516,7 +516,7 @@ DEFINE_int32(clients_per_warehouse, 1, "number of clients per warehouse"
 		" (for tpcc)");
 DEFINE_int32(remote_item_milli_p, 0, "remote item milli p (for tpcc)");
 
-DEFINE_int32(tpcc_num_warehouses, 20, "number of warehouses (for tpcc)");
+DEFINE_int32(tpcc_num_warehouses, 1, "number of warehouses (for tpcc)");
 DEFINE_int32(tpcc_w_id, 1, "home warehouse id for this client (for tpcc)");
 DEFINE_int32(tpcc_C_c_id, 1, "C value for NURand() when selecting"
     " random customer id (for tpcc)");
@@ -1125,30 +1125,16 @@ int main(int argc, char **argv) {
 	      tport->Timer(0, [bench, bdcb]() { bench->Start(bdcb, FLAGS_batch_optimization); });
         break;
       case BENCH_SMALLBANK_SYNC:
-      case BENCH_TPCC_SYNC:
-      case BENCH_YCSB_SYNC: {
+      case BENCH_TPCC_SYNC: {
         SyncTransactionBenchClient *syncBench = dynamic_cast<SyncTransactionBenchClient *>(bench);
         UW_ASSERT(syncBench != nullptr);
         threads.push_back(new std::thread([syncBench, bdcb](){
             syncBench->Start([](){}, FLAGS_batch_optimization);
-            if (FLAGS_batch_optimization == false){
-              while (!syncBench->IsFullyDone()) {
-                syncBench->StartLatency();
-                transaction_status_t result;
-                syncBench->SendNext(&result);
-                syncBench->IncrementSent(result);
-              }
-            }
-            else{
-              while (!syncBench->IsFullyDone()) {
-                syncBench->StartLatency();
-                //transaction_status_t result;
-                /*
-                std::vector<transaction_status_t> results;
-                syncBench->SendNext_batch(results);
-                syncBench->IncrementSent_batch(results);
-                */
-              }
+            while (!syncBench->IsFullyDone()) {
+              syncBench->StartLatency();
+              transaction_status_t result;
+              syncBench->SendNext(&result);
+              syncBench->IncrementSent(result);
             }
             bdcb();
         }));

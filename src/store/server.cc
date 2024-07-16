@@ -80,7 +80,7 @@ DEFINE_uint64(num_groups, 1, "number of replica groups in the system");
 DEFINE_uint64(num_shards, 1, "number of shards in the system");
 DEFINE_bool(debug_stats, true, "record stats related to debugging");
 DEFINE_uint64(num_ops, 1, "number of keys to generate");
-DEFINE_bool(batch_optimization, true, "if true batch optimization, false no batch optimization");
+DEFINE_bool(batch_optimization, false, "if true batch optimization, false no batch optimization");
 DEFINE_bool(signature_batch, false, "if true signature_batch, else if false no conventional.");
 
 DEFINE_bool(rw_or_retwis, true, "true for rw, false for retwis");
@@ -303,7 +303,7 @@ DEFINE_string(stats_file, "", "path to file for server stats");
 // 代入されている場合は、smallbankかtpccで、data_file_pathにパスを代入する必要があるはず。
 DEFINE_string(keys_path, "", "path to file containing keys in the system");
 DEFINE_uint64(num_keys, 0, "number of keys to generate");
-DEFINE_string(data_file_path, "", "path to file containing key-value pairs to be loaded");
+DEFINE_string(data_file_path, "/Basil_with_ReTx/src/store/benchmark/async/tpcc/tpcc-1-warehouse", "path to file containing key-value pairs to be loaded");
 
 Server *server = nullptr;
 TransportReceiver *replica = nullptr;
@@ -567,7 +567,6 @@ int main(int argc, char **argv) {
     size_t loaded = 0;
     size_t stored = 0;
     Debug("Populating with data from %s.", FLAGS_data_file_path.c_str());
-    printf("Populating with data from %s.", FLAGS_data_file_path.c_str());
     std::vector<int> txnGroups;
     while (!in.eof()) {
       std::string key;
@@ -582,8 +581,6 @@ int main(int argc, char **argv) {
         ++loaded;
       }
     }
-    printf("Stored %lu out of %lu key-value pairs from file %s.", stored,
-        loaded, FLAGS_data_file_path.c_str());
 		Notice("Stored %lu out of %lu key-value pairs from file %s.", stored,
         loaded, FLAGS_data_file_path.c_str());
     // Debug("Stored %lu out of %lu key-value pairs from file %s.", stored,

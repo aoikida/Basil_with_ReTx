@@ -45,7 +45,10 @@ AsyncOrderStatus::~AsyncOrderStatus() {
 
 Operation AsyncOrderStatus::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
   std::map<std::string, std::string> readValues) {
-  if (finishedOpCount == 0) {
+  if (finishedOpCount != outstandingOpCount){
+    return Wait();
+  }
+  else if (finishedOpCount == 0) {
     Debug("ORDER_STATUS");
     Debug("Warehouse: %u", c_w_id);
     Debug("District: %u", c_d_id);

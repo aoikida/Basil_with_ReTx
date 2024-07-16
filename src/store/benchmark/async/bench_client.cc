@@ -68,7 +68,7 @@ BenchmarkClient::~BenchmarkClient() {
 }
 
 void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization) {
-  Debug("BenchmarkClient::Start\n");
+  Notice("BenchmarkClient::Start\n");
 	n = 0;
   curr_bdcb = bdcb;
   transport.Timer(warmupSec * 1000, std::bind(&BenchmarkClient::WarmupDone,

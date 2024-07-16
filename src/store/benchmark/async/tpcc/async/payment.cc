@@ -46,14 +46,18 @@ AsyncPayment::~AsyncPayment() {
 
 Operation AsyncPayment::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
   std::map<std::string, std::string> readValues) {
-  
 
+  std::cerr << "outstandingOpCount: " << outstandingOpCount << "finishedOpCount: " << finishedOpCount << std::endl;
   
-  if (finishedOpCount == 0) {
+  if (finishedOpCount != outstandingOpCount){
+    return Wait();
+  }
+  else if (finishedOpCount == 0) {
     Debug("Amount: %u", h_amount);
     Debug("Warehouse: %u", w_id);
     return Get(WarehouseRowKey(w_id));
-  } else if (finishedOpCount == 1) {
+  } 
+  else if (finishedOpCount == 1) {
     std::string w_key = WarehouseRowKey(w_id);
     auto w_row_itr = readValues.find(w_key);
     UW_ASSERT(w_row_itr != readValues.end());
@@ -69,10 +73,12 @@ Operation AsyncPayment::GetNextOperation(size_t outstandingOpCount, size_t finis
     std::string w_row_out;
     w_row.SerializeToString(&w_row_out);
     return Put(w_key, w_row_out);
-  } else if (finishedOpCount == 2) {
+  } 
+  else if (finishedOpCount == 2) {
     Debug("District: %u", d_id);
     return Get(DistrictRowKey(d_w_id, d_id));
-  } else if (finishedOpCount == 3) {
+  } 
+  else if (finishedOpCount == 3) {
     std::string d_key = DistrictRowKey(d_w_id, d_id);
     auto d_row_itr = readValues.find(d_key);
     UW_ASSERT(d_row_itr != readValues.end());
@@ -84,7 +90,8 @@ Operation AsyncPayment::GetNextOperation(size_t outstandingOpCount, size_t finis
     std::string d_row_out;
     d_row.SerializeToString(&d_row_out);
     return Put(d_key, d_row_out);
-  } else if (finishedOpCount == 4) {
+  } 
+  else if (finishedOpCount == 4) {
     if (c_by_last_name) { // access customer by last name
       Debug("Customer: %s", c_last.c_str());
       Debug("  Get(c_w_id=%u, c_d_id=%u, c_last=%s)", c_w_id, c_d_id,
@@ -94,7 +101,8 @@ Operation AsyncPayment::GetNextOperation(size_t outstandingOpCount, size_t finis
       Debug("Customer: %u", c_id);
       return Get(CustomerRowKey(c_w_id, c_d_id, c_id));
     }
-  } else {
+  } 
+  else {
     uint32_t count;
     if (c_by_last_name) {
       if (finishedOpCount == 5) {

@@ -45,7 +45,10 @@ AsyncStockLevel::~AsyncStockLevel() {
 
 Operation AsyncStockLevel::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
   std::map<std::string, std::string> readValues) {
-  if (finishedOpCount == 0) {
+  if (finishedOpCount != outstandingOpCount){
+    return Wait();
+  }
+  else if (finishedOpCount == 0) {
     Debug("STOCK_LEVEL");
     Debug("Warehouse: %u", w_id);
     Debug("District: %u", d_id);
