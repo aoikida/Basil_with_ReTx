@@ -53,7 +53,6 @@ TPCCClient::~TPCCClient() {
 
 TPCCTransactionType TPCCClient::GetNextTransaction(uint32_t *wid,
     uint32_t *did, std::mt19937 &gen) {
-  std::cerr << "TPCCClient::GetNextTransaction" << std::endl;
   if (delivery && deliveryDId < 10) {
     deliveryDId++;
     *wid = deliveryWId;
