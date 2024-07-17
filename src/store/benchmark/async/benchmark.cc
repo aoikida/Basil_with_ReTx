@@ -139,7 +139,7 @@ DEFINE_bool(ping_replicas, false, "determine latency to replicas via pings");
 DEFINE_bool(tapir_sync_commit, true, "wait until commit phase completes before"
     " sending additional transactions (for TAPIR)");
 //追加
-DEFINE_bool(batch_optimization, false, "if true batch optimization, else if false no conventional.");
+DEFINE_bool(batch_optimization, true, "if true batch optimization, else if false no conventional.");
 DEFINE_bool(signature_batch, false, "if true signature_batch, else if false no conventional.");
 
 //rw setting
@@ -1176,23 +1176,30 @@ int main(int argc, char **argv) {
   // FlushStats
   tport->Run();
 
-
-  int latencySize = 0;
+  std::vector<uint64_t> all_latencies;
+  char buf[1024]; 
   uint64_t ns = 0;
-  char buf[1024];
 
   for (int i = 0; i < FLAGS_num_clients; i++){
     for (auto latency : benchClients[i]->latencies) {
       ns += latency;
-      latencySize++;
+      all_latencies.push_back(latency);
     }
   }
 
-  ns = ns / latencySize;
-
+  ns = ns / all_latencies.size();
   LatencyFmtNS(ns, buf);
-  Notice("latency is %ld ns (%s)", ns, buf);
-  Notice("throughput is %f", (double)latencySize / (double)FLAGS_exp_duration);
+  Notice("Average latency is %ld ns (%s)", ns, buf);
+
+  ns  = all_latencies[all_latencies.size() / 2];
+	LatencyFmtNS(ns, buf);
+	Notice("Median latency is %ld ns (%s)", ns, buf);
+
+  ns = all_latencies[all_latencies.size() * 99 / 100];
+	LatencyFmtNS(ns, buf);
+	Notice("99th percentile latency is %ld ns (%s)", ns, buf);
+  
+  Notice("throughput is %f", (double)all_latencies.size() / (double)FLAGS_exp_duration);
 
   Cleanup(0);
 
