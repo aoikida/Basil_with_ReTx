@@ -39,7 +39,7 @@ RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, std::mt19937 
       } else {
         key = keyIdxs[i - 1];
       }
-      std::cout << "key:" << key << std::endl;
+      //std::cout << "key:" << key << std::endl;
       keyIdxs.push_back(key);
     }
   }
@@ -51,7 +51,7 @@ RWTransaction::RWTransaction(KeySelector *keySelector, int numOps, std::mt19937 
       } else {
         key = keyIdxs[i - 1];
       }
-      std::cout << "key:" << key << std::endl;
+      //std::cout << "key:" << key << std::endl;
       keyIdxs.push_back(key);
     }
   }
@@ -63,7 +63,7 @@ RWTransaction::~RWTransaction() {
 Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues) {
   if (outstandingOpCount < GetNumOps()) {
-    std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
+    //std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
     if(finishedOpCount != outstandingOpCount){
       return Wait();
     }
@@ -71,7 +71,7 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
       std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
       return Get(GetKey(finishedOpCount));
     } else  {
-      std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
+      //std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
       auto strValueItr = readValues.find(GetKey(finishedOpCount));
       UW_ASSERT(strValueItr != readValues.end());
       std::string strValue = strValueItr->second;
@@ -103,10 +103,10 @@ Operation RWTransaction::GetNextOperation_batch(size_t OpCount, size_t TxCount, 
   Debug("Operation count: %d\n", OpCount);
   if (OpCount < numOps) {
     if (readOnly || OpCount % 2 == 0) {
-      std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+      //std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
       return Get(GetKey(OpCount + TxCount * numOps));
     } else {
-      std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+      //std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
       //writeの値は後で入れる
       return Put(GetKey(OpCount + TxCount * numOps), "");
     }

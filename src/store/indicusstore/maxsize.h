@@ -29,8 +29,8 @@
 #define MAX_SIZE_H
 
 //バッチサイズ*トランザクション内のオペレーション数に設定する。
-#define MAX_MESSAGE_SIZE 640
+#define MAX_MESSAGE_SIZE 240
 //バッチサイズに設定する。
-#define MAX_TRANSACTION_SIZE 64
+#define MAX_TRANSACTION_SIZE 24
 
 #endif /* MAX_SIZE_H */

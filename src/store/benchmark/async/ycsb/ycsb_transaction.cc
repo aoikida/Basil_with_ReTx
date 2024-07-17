@@ -33,14 +33,14 @@ std::mt19937 &rand, bool batchOptimization, int batchSize) : keySelector(keySele
   if (!batchOptimization){
     for (int i = 0; i < numOps; ++i) {
       uint64_t key = keySelector->GetKey(rand);
-      std::cout << "key:" << key << std::endl;
+      //std::cout << "key:" << key << std::endl;
       keyIdxs.push_back(key);
     }
   }
   else {
     for (int i = 0; i < numOps * batchSize; ++i) {
       uint64_t key = keySelector->GetKey(rand);
-      std::cout << "key:" << key << std::endl;
+      //std::cout << "key:" << key << std::endl;
       keyIdxs.push_back(key);
     }
   }
@@ -52,16 +52,16 @@ YCSBTransaction::~YCSBTransaction() {
 Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t finishedOpCount,
     std::map<std::string, std::string> readValues) {
   if (finishedOpCount < GetNumOps()) {
-    std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
+    //std::cerr << "outstanding: " << outstandingOpCount << "; finished: " << finishedOpCount << "num ops: " << GetNumOps() << std::endl;
     if (finishedOpCount != outstandingOpCount) {
       return Wait();
     }
     else if ((rand() % 100) < readRatio) {
-      std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
+      //std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
       return Get(GetKey(finishedOpCount));
     } 
     else {
-        std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
+        //std::cerr << "write: " << GetKey(finishedOpCount) << std::endl;
         auto strValueItr = readValues.find(GetKey(finishedOpCount));
 
         std::string strValue;
@@ -88,7 +88,7 @@ Operation YCSBTransaction::GetNextOperation(size_t outstandingOpCount, size_t fi
     }
   }
   else if (finishedOpCount == GetNumOps()) {
-    std::cerr << "commit" << std::endl;
+    //std::cerr << "commit" << std::endl;
     return Commit();
   }
   else {
@@ -101,19 +101,19 @@ Operation YCSBTransaction::GetNextOperation_batch(size_t OpCount, size_t TxCount
   Debug("Number of operations: %d\n", numOps);
   Debug("Operation count: %d\n", OpCount);
   if (OpCount < numOps) {
-    std::cerr << "outstanding: " << OpCount << "; num ops: " << numOps << std::endl;
+    //std::cerr << "outstanding: " << OpCount << "; num ops: " << numOps << std::endl;
     if ((rand() % 100) < readRatio) {
-      std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+      //std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
       return Get(GetKey(OpCount + TxCount * numOps));
     } 
     else {
-        std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
+        //std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
         //writeの値は後で入れる
         return Put(GetKey(OpCount + TxCount * numOps), "");
     }
   }
   else if (OpCount == numOps) {
-    std::cerr << "commit" << std::endl;
+    //std::cerr << "commit" << std::endl;
     return Commit();
   }
 }
