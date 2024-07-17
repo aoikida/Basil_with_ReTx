@@ -108,8 +108,12 @@ Operation RWTransaction::GetNextOperation_batch(size_t OpCount, size_t TxCount, 
     } else {
       std::cerr << "write: " << GetKey(OpCount + TxCount * numOps) << std::endl;
       auto strValueItr = readValues.find(GetKey(OpCount + TxCount * numOps));
-      UW_ASSERT(strValueItr != readValues.end());
-      std::string strValue = strValueItr->second;
+      std::string strValue;
+        if (strValueItr != readValues.end()) {
+            strValue = strValueItr->second;
+        } else {
+            strValue = "";
+        }
       std::string writeValue;
       if (strValue.length() == 0) {
         writeValue = std::string(100, '\0'); //make a longer string
