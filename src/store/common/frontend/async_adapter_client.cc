@@ -312,6 +312,29 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
 void AsyncAdapterClient::ExecuteWriteOperation(){
 
   for(auto op = write_set.begin(); op != write_set.end(); ++op){
+
+    // writeする値を作る
+    auto strValueItr = readValues.find(op->key);
+      std::string strValue;
+        if (strValueItr != readValues.end()) {
+            strValue = strValueItr->second;
+        } else {
+            strValue = "";
+        }
+      if (strValue.length() == 0) {
+        op->value = std::string(100, '\0'); //make a longer string
+      } else {
+        uint64_t intValue = 0;
+        for (int i = 0; i < 100; ++i) {
+          intValue = intValue | (static_cast<uint64_t>(strValue[i]) << ((99 - i) * 8));
+        }
+        intValue++;
+        for (int i = 0; i < 100; ++i) {
+          op->value += static_cast<char>((intValue >> (99 - i) * 8) & 0xFF);
+        }
+      }
+
+    // writeを実行する
     client->Put(op->key, op->value, std::bind(&AsyncAdapterClient::PutCallback_batch,
             this, std::placeholders::_1, std::placeholders::_2,
             std::placeholders::_3), std::bind(&AsyncAdapterClient::PutTimeout,
