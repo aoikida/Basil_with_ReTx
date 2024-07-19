@@ -266,7 +266,8 @@ void BenchmarkClient::IncrementSentBig(int result, int abortSize) {
           //std::cout << "#start," << startMeasureTime.tv_sec << "," << startMeasureTime.tv_usec << std::endl;
         }
         uint64_t currNanos = curr.tv_sec * 1000000000ULL + curr.tv_nsec;
-        ns *= abortSize;
+        //ここは明らかにおかしい
+        //ns *= abortSize;
         latencies.push_back(ns);
       }
     }
