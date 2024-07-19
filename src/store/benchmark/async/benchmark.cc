@@ -1187,6 +1187,8 @@ int main(int argc, char **argv) {
     }
   }
 
+  std::sort(all_latencies.begin(), all_latencies.end());
+
   ns = ns / all_latencies.size();
   LatencyFmtNS(ns, buf);
   Notice("Average latency is %ld ns (%s)", ns, buf);
@@ -1194,6 +1196,14 @@ int main(int argc, char **argv) {
   ns  = all_latencies[all_latencies.size() / 2];
 	LatencyFmtNS(ns, buf);
 	Notice("Median latency is %ld ns (%s)", ns, buf);
+
+  ns = all_latencies[all_latencies.size() * 90 / 100];
+	LatencyFmtNS(ns, buf);
+	Notice("90th percentile latency is %ld ns (%s)", ns, buf);
+
+	ns = all_latencies[all_latencies.size() * 95 / 100];
+	LatencyFmtNS(ns, buf);
+	Notice("95th percentile latency is %ld ns (%s)", ns, buf);
 
   ns = all_latencies[all_latencies.size() * 99 / 100];
 	LatencyFmtNS(ns, buf);

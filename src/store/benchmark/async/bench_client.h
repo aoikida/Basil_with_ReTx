@@ -47,13 +47,13 @@ class BenchmarkClient {
   void Start(bench_done_callback bdcb, bool batchOptimization);
   void OnReply(int result);
 
-  void OnReplyBig(int result, int batch_size, int abortSize);
+  void OnReplyBig(int result, int batchSize, int abortSize);
 
   void StartLatency();
   virtual void SendNext() = 0;
   virtual void SendNext_batch() = 0;
   void IncrementSent(int result);
-  void IncrementSentBig(int result, int abortSize);
+  void IncrementSentBig(int result, int batchSize, int abortSize);
   inline bool IsFullyDone() { return done; }
 
   struct Latency_t latency;

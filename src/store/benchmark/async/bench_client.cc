@@ -68,7 +68,7 @@ BenchmarkClient::~BenchmarkClient() {
 }
 
 void BenchmarkClient::Start(bench_done_callback bdcb, bool batchOptimization) {
-  Notice("BenchmarkClient::Start\n");
+  Notice("BenchmarkClient::Start, expDuration: %d, warmupSec: %d, cooldownSec: %d\n", expDuration, warmupSec, cooldownSec);
 	n = 0;
   curr_bdcb = bdcb;
   transport.Timer(warmupSec * 1000, std::bind(&BenchmarkClient::WarmupDone,
@@ -107,20 +107,21 @@ void BenchmarkClient::TimeInterval() {
 
 void BenchmarkClient::WarmupDone() {
   started = true;
-  Notice("Completed warmup period of %d seconds with %d requests", warmupSec,
-      n);
+  Notice("Completed warmup period of %d seconds with %d requests", warmupSec, n);
   n = 0;
 }
 
 void BenchmarkClient::CooldownDone() {
   done = true;
 
+  Notice("Finished cooldown period of %d seconds", cooldownSec);
+
+  /*
   char buf[1024];
-  Notice("Finished cooldown period of %d soconds", cooldownSec);
+  
   std::sort(latencies.begin(), latencies.end());
 
 	Debug("crashing because latencies of size %d", latencies.size());
-  /*
 	if(latencies.size()>0){
 		uint64_t ns = latencies[latencies.size()/2];
 		LatencyFmtNS(ns, buf);
@@ -170,18 +171,10 @@ void BenchmarkClient::OnReply(int result) {
   }
 }
 
-void BenchmarkClient::OnReplyBig(int result, int batch_size, int abortSize) {
+void BenchmarkClient::OnReplyBig(int result, int batchSize, int abortSize) {
   Debug("BenchmarkClient::OnReplyBig");
 
-  for (int i = 0; i< batch_size; i++){
-    if (i== 0){
-      IncrementSentBig(result, abortSize + 1);
-    }
-    else{
-      IncrementSentBig(result, 1);
-    }
-    
-  }
+  IncrementSentBig(result, batchSize, abortSize + 1);
 
   if (done) {
     return;
@@ -248,9 +241,9 @@ void BenchmarkClient::IncrementSent(int result) {
   n++;
 }
 
-void BenchmarkClient::IncrementSentBig(int result, int abortSize) {
+void BenchmarkClient::IncrementSentBig(int result, int batchSize, int abortSize) {
   if (started) {
-    Debug("IncrementSent is called \n");
+    Debug("IncrementSentBig is called, cooldownStarted: %d, result: %d \n", cooldownStarted, result);
     // record latency
     if (!cooldownStarted) {
       uint64_t ns = Latency_End(&latency);
@@ -266,9 +259,19 @@ void BenchmarkClient::IncrementSentBig(int result, int abortSize) {
           //std::cout << "#start," << startMeasureTime.tv_sec << "," << startMeasureTime.tv_usec << std::endl;
         }
         uint64_t currNanos = curr.tv_sec * 1000000000ULL + curr.tv_nsec;
-        //ここは明らかにおかしい
-        //ns *= abortSize;
-        latencies.push_back(ns);
+
+        //繰り返しlatenciesにnsを代入
+
+        
+        for (int i = 0; i < batchSize; i++){
+          if (i == batchSize - 1){
+            ns *= abortSize;
+            latencies.push_back(ns);
+          }
+          else {
+            latencies.push_back(ns);
+          }
+        }
       }
     }
 
@@ -293,8 +296,7 @@ void BenchmarkClient::IncrementSentBig(int result, int abortSize) {
       CooldownDone();
     }
   }
-
-  n++;
+  n += batchSize;
 }
 
 void BenchmarkClient::Finish() {

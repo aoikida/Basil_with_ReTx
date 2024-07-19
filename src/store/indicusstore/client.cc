@@ -142,7 +142,7 @@ void Client::Begin(begin_callback bcb, begin_timeout_callback btcb,
       first = false;
     }
 
-    Latency_Start(&executeLatency);
+    //Latency_Start(&executeLatency);
     client_seq_num++;
     //std::cerr<< "BEGIN TX with client_seq_num: " << client_seq_num << std::endl;
     Debug("BEGIN [%lu]", client_seq_num);
@@ -188,7 +188,7 @@ void Client::Begin_batch(begin_callback_batch bcb, begin_timeout_callback btcb,
       first = false;
     }
 
-    Latency_Start(&executeLatency);
+    //Latency_Start(&executeLatency);
     client_seq_num++;
     //std::cerr<< "BEGIN TX with client_seq_num: " << client_seq_num << std::endl;
     Debug("BEGIN [%lu]", client_seq_num);
@@ -296,7 +296,8 @@ void Client::Commit(commit_callback cc, commit_timeout_callback ctcb,
   Debug("Client::Commit is called");
       
   transport->Timer(0, [this, cc, ctcb, timeout]() {
-    uint64_t ns = Latency_End(&executeLatency);
+    //uint64_t ns = Latency_End(&executeLatency);
+
     //Latency_Start(&commitLatency);
     //XXX flag to sort read/write sets for parallel OCC
     if(params.parallel_CCC){
@@ -833,7 +834,7 @@ void Client::Abort(abort_callback acb, abort_timeout_callback atcb,
     // immediately move on to its next transaction without waiting for confirmation
     // that this transaction was aborted
 
-    uint64_t ns = Latency_End(&executeLatency);
+    //uint64_t ns = Latency_End(&executeLatency);
 
     Debug("ABORT[%lu:%lu]", client_id, client_seq_num);
 
@@ -871,7 +872,7 @@ void Client::FailureCleanUp(PendingRequest *req) {
 
   }
   if (!req->callbackInvoked) {
-    uint64_t ns = Latency_End(&commitLatency);
+    //uint64_t ns = Latency_End(&commitLatency);
     if (params.batchOptimization){
       req->ccb(result, req->id);
     }
@@ -944,7 +945,7 @@ void Client::ForwardWBcallback(uint64_t txnId, int group, proto::ForwardWritebac
   }
 
   if (!req->callbackInvoked) {
-    uint64_t ns = Latency_End(&commitLatency);
+    //uint64_t ns = Latency_End(&commitLatency);
     if (params.batchOptimization){
       req->ccb(result, req->id);
     }
