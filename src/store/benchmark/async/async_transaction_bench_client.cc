@@ -46,7 +46,6 @@ AsyncTransactionBenchClient::~AsyncTransactionBenchClient() {
 }
 
 void AsyncTransactionBenchClient::SendNext() {
-  std::cerr << "AsyncTransactionBenchClient::SendNext" << std::endl;
   currTxn = GetNextTransaction();
   Latency_Start(&latency);
   currTxnAttempts = 0;
