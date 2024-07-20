@@ -2,13 +2,13 @@
 
 F=0
 NUM_GROUPS=1
-CONFIG="shard-r0.config"
+CONFIG="shard-r6.config"
 PROTOCOL="indicus"
 STORE=${PROTOCOL}store
 DURATION=1
 ZIPF=0.00
 NUM_OPS_TX=10
-NUM_KEYS_IN_DB=100000
+NUM_KEYS_IN_DB=1000000
 KEY_PATH="/usr/local/etc/indicus-keys/donna"
 BATCH_SIZE=2
 REPLICA_ID=0
@@ -32,8 +32,7 @@ done
 N=$((5*$F+1))
 
 echo 'Starting Replica :'$((REPLICA_ID))
-# DEBUG=store/indicusstore/*
-store/server --config_path $CONFIG --group_idx $GROUP_ID \
+DEBUG=store/indicusstore/* store/server --config_path $CONFIG --group_idx $GROUP_ID \
  --num_groups $NUM_GROUPS --num_shards $NUM_GROUPS --replica_idx $REPLICA_ID --protocol $PROTOCOL \
  --num_keys $NUM_KEYS_IN_DB --zipf_coefficient $ZIPF --num_ops $NUM_OPS_TX --indicus_key_path $KEY_PATH &> server$((REPLICA_ID)).out
 

@@ -7,15 +7,15 @@ NUM_GROUPS=1 #シャードの数
 CONFIG="shard-r0.config" #設定ファイルは"shard-r1.config"
 PROTOCOL="indicus" #プロトコルは"indicus(Basilのこと)""
 STORE=PROTOCOL+"store" #store = "indicusstore"
-DURATION=5 #実行時間は10秒
+DURATION=15 #実行時間は10秒
 NUM_OPS_TX=2 #トランザクション内のオペレーション数
 NUM_KEYS_IN_DB=1000000 #データベース内のレコードの数
 KEY_PATH="/usr/local/etc/indicus-keys/donna" #keyのパス
-BENCHMARK="rw" #rwとretwis以外使用できない #smallbankとtpcc-syncは同期環境を想定しているので工夫が必要かも
-BATCH_SIZE=3
+BENCHMARK="ycsb" #rwとretwis以外使用できない #smallbankとtpcc-syncは同期環境を想定しているので工夫が必要かも
+BATCH_SIZE=5
 READ_RATIO=50
 DISTRIBUTION="zipf"
-ZIPF=0.00
+ZIPF=0.99
 
 
 
@@ -48,7 +48,7 @@ for i in `seq 0 $((CLIENTS-1))`; do
   DEBUG=store/indicusstore/* store/benchmark/async/benchmark --config_path $CONFIG --num_groups $NUM_GROUPS \
     --num_shards $NUM_GROUPS \
     --protocol_mode $PROTOCOL --num_keys $NUM_KEYS_IN_DB --benchmark $BENCHMARK --num_ops $NUM_OPS_TX \
-    --exp_duration $DURATION --client_id $i --num_clients $CLIENT_THREAD --warmup_secs 0 --cooldown_secs 0 \
+    --exp_duration $DURATION --client_id $i --num_clients $CLIENT_THREAD --warmup_secs 5 --cooldown_secs 5 \
     --key_selector $DISTRIBUTION --zipf_coefficient $ZIPF --stats_file "stats-0.json" --indicus_key_path $KEY_PATH \
     --indicus_batch_size $BATCH_SIZE  --read_ratio $READ_RATIO &> client0.out &
 done;
