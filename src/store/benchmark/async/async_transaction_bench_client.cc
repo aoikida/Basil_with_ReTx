@@ -110,7 +110,7 @@ void AsyncTransactionBenchClient::ExecuteCallback(transaction_status_t result,
 }
 
 void AsyncTransactionBenchClient::ExecuteBigCallback(transaction_status_t result,
-    std::map<std::string, std::string> readValues, uint64_t batchSize, uint64_t abortSize) {
+    std::map<std::string, std::string> readValues, uint64_t batchSize, bool includeAbortTx) {
   Debug("ExecuteCallback with result %d.", result);
   stats.Increment(GetLastOp() + "_attempts", 1);
   ++currTxnAttempts;
@@ -129,7 +129,7 @@ void AsyncTransactionBenchClient::ExecuteBigCallback(transaction_status_t result
     delete currTxn;
     currTxn = nullptr;
     ///ここを通っている。ここがトランザクションのlatencyのendかつ、次のトランザクションのlatencyのstart
-    OnReplyBig(result, batchSize, abortSize);
+    OnReplyBig(result, batchSize, abort);
   } else {
     stats.Increment(GetLastOp() + "_" + std::to_string(result), 1);
     uint64_t backoff = 0;

@@ -58,6 +58,7 @@ class AsyncAdapterClient : public AsyncClient {
   void ExecuteWriteOperation();
   void ExecuteReadOperation();
   void ExecuteCommit();
+  void RedivisionTransaction();
   int writeOpNum = 0;
   int readOpNum = 0;
   int putCbCount = 0;
@@ -82,8 +83,9 @@ class AsyncAdapterClient : public AsyncClient {
   std::vector<Operation> write_set;
   std::vector<Operation> pre_write_set;
   std::vector<Operation> conflict_write_set;
-  std::vector<std::vector<Operation>> abort_set;
-  uint64_t batch_size;
+  std::vector<Operation> retry_tx;
+  int tx_num;
+  int batch_size;
   int txSize;
   int batchSize;
 
@@ -91,6 +93,7 @@ class AsyncAdapterClient : public AsyncClient {
 
   std::vector<get_callback> gcb_list;
 
+  bool includeRetryTx;
   bool wait_flag;
   bool writeread = false;
   bool readwrite = false;

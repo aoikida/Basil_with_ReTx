@@ -55,7 +55,7 @@ protected:
                          std::map<std::string, std::string> readValues);
 
     void ExecuteBigCallback(transaction_status_t result,
-                         std::map<std::string, std::string> readValues, uint64_t batchSize, uint64_t abortSize);
+                         std::map<std::string, std::string> readValues, uint64_t batchSize, bool includeAbortTx);
 
     AsyncClient &client;
 private:

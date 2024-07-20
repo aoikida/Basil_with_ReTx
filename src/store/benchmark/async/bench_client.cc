@@ -171,10 +171,10 @@ void BenchmarkClient::OnReply(int result) {
   }
 }
 
-void BenchmarkClient::OnReplyBig(int result, int batchSize, int abortSize) {
+void BenchmarkClient::OnReplyBig(int result, int batchSize, bool includeRetryTx) {
   Debug("BenchmarkClient::OnReplyBig");
 
-  IncrementSentBig(result, batchSize, abortSize + 1);
+  IncrementSentBig(result, batchSize, includeRetryTx);
 
   if (done) {
     return;
@@ -241,7 +241,7 @@ void BenchmarkClient::IncrementSent(int result) {
   n++;
 }
 
-void BenchmarkClient::IncrementSentBig(int result, int batchSize, int abortSize) {
+void BenchmarkClient::IncrementSentBig(int result, int batchSize, bool includeRetryTx) {
   if (started) {
     Debug("IncrementSentBig is called, cooldownStarted: %d, result: %d \n", cooldownStarted, result);
     // record latency
@@ -260,18 +260,20 @@ void BenchmarkClient::IncrementSentBig(int result, int batchSize, int abortSize)
         }
         uint64_t currNanos = curr.tv_sec * 1000000000ULL + curr.tv_nsec;
 
-        //繰り返しlatenciesにnsを代入
-
-        
         for (int i = 0; i < batchSize; i++){
-          if (i == batchSize - 1){
-            ns *= abortSize;
-            latencies.push_back(ns);
+          if (i == 0){
+            if (includeRetryTx == true){
+              latencies.push_back(ns + previousTxLatency);
+            }
+            else {
+              latencies.push_back(ns);
+            }
           }
           else {
             latencies.push_back(ns);
           }
         }
+        previousTxLatency = ns;
       }
     }
 

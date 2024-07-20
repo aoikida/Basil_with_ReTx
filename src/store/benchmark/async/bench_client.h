@@ -47,13 +47,13 @@ class BenchmarkClient {
   void Start(bench_done_callback bdcb, bool batchOptimization);
   void OnReply(int result);
 
-  void OnReplyBig(int result, int batchSize, int abortSize);
+  void OnReplyBig(int result, int batchSize, bool includeRetryTx);
 
   void StartLatency();
   virtual void SendNext() = 0;
   virtual void SendNext_batch() = 0;
   void IncrementSent(int result);
-  void IncrementSentBig(int result, int batchSize, int abortSize);
+  void IncrementSentBig(int result, int batchSize, bool includeRetryTx);
   inline bool IsFullyDone() { return done; }
 
   struct Latency_t latency;
@@ -62,6 +62,7 @@ class BenchmarkClient {
   bool cooldownStarted;
   int tputInterval;
   std::vector<uint64_t> latencies;
+  uint64_t previousTxLatency = 0;
 
   inline const Stats &GetStats() const { return stats; }
  protected:
