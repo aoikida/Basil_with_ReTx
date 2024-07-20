@@ -161,11 +161,12 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
     if (tx_conflict_finish == false && op_conflict_finish == false){
       Debug("%d : transaction finish\n", tx_num);
       for(auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
-        readValues.insert(std::make_pair((*itr).key, ""));
+        (*itr).txId = tx_num;
         read_set.push_back(*itr);
         readOpNum++;
       }
       for(auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
+        (*itr).txId = tx_num;
         write_set.push_back(*itr);
         writeOpNum++;
       }
@@ -272,11 +273,12 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
     if (tx_conflict_finish == false && op_conflict_finish == false){
       Debug("%d : transaction finish\n", tx_num);
       for(auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
-        readValues.insert(std::make_pair((*itr).key, ""));
+        (*itr).txId = tx_num;
         read_set.push_back(*itr);
         readOpNum++;
       }
       for(auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
+        (*itr).txId = tx_num;
         write_set.push_back(*itr);
         writeOpNum++;
       }
@@ -481,7 +483,18 @@ void AsyncAdapterClient::CommitCallback(transaction_status_t result) {
 
 void AsyncAdapterClient::CommitBigCallback(transaction_status_t result) {
   Debug("Commit Big callback.");
-  //Go to store/benchmark/async/async_transaction_bench_client.cc 
+  //Go to store/benchmark/async/async_transaction_bench_client.cc
+
+  
+  std::vector<std::vector<Operation>> returnTx(batch_size);
+  for (auto op = write_set.begin(); op != write_set.end(); ++op){
+    returnTx[op->txId].push_back(*op);
+  }
+  for (auto op = read_set.begin(); op != read_set.end(); ++op){
+    returnTx[op->txId].push_back(*op);
+  }
+  
+  
   currEcbcb(result, readValues, batch_size, abort_set.size());
 }
 

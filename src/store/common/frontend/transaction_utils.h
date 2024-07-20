@@ -41,6 +41,7 @@ struct Operation {
   OperationType type;
   std::string key;
   std::string value;
+  int txId = 0;
 };
 
 Operation Wait();
