@@ -67,7 +67,7 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
     if(finishedOpCount != outstandingOpCount){
       return Wait();
     }
-    else if (readOnly || outstandingOpCount % 2 == 0) {
+    else if (outstandingOpCount % 2 == 0) {
       std::cerr << "read: " << GetKey(finishedOpCount) << std::endl;
       return Get(GetKey(finishedOpCount));
     } else  {
@@ -99,10 +99,9 @@ Operation RWTransaction::GetNextOperation(size_t outstandingOpCount, size_t fini
 
 
 Operation RWTransaction::GetNextOperation_batch(size_t OpCount, size_t TxCount, std::map<std::string, std::string> readValues) {
-  Debug("Number of operations: %d\n", numOps);
   Debug("Operation count: %d\n", OpCount);
   if (OpCount < numOps) {
-    if (readOnly || OpCount % 2 == 0) {
+    if (OpCount % 2 == 0) {
       //std::cerr << "read: " << GetKey(OpCount + TxCount * numOps) << std::endl;
       return Get(GetKey(OpCount + TxCount * numOps));
     } else {
