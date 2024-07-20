@@ -1,0 +1,1 @@
+cmd='/Basil_with_ReTx/src/store/hotstuffstore/libhotstuff/secp256k1/autogen.sh;COMMAND;/Basil_with_ReTx/src/store/hotstuffstore/libhotstuff/secp256k1/configure;--disable-shared;--with-pic;--with-bignum=no;--enable-module-recovery'

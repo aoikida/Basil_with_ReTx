@@ -1,0 +1,135 @@
+Determining if the function kstat_lookup exists in the kstat failed with the following output:
+Change Dir: /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_465b9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_465b9.dir/build.make CMakeFiles/cmTC_465b9.dir/build
+make[1]: Entering directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_465b9.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=kstat_lookup   -std=gnu11 -o CMakeFiles/cmTC_465b9.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_465b9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_465b9.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=kstat_lookup    CMakeFiles/cmTC_465b9.dir/CheckFunctionExists.c.o  -o cmTC_465b9  -L/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/kstat.h -Wl,-rpath,/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/kstat.h -lkstat 
+/usr/bin/ld: cannot find -lkstat
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_465b9.dir/build.make:97: recipe for target 'cmTC_465b9' failed
+make[1]: *** [cmTC_465b9] Error 1
+make[1]: Leaving directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_465b9/fast' failed
+make: *** [cmTC_465b9/fast] Error 2
+
+
+Determining if the function kvm_open exists in the kvm failed with the following output:
+Change Dir: /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9ddfa/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9ddfa.dir/build.make CMakeFiles/cmTC_9ddfa.dir/build
+make[1]: Entering directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9ddfa.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=kvm_open   -std=gnu11 -o CMakeFiles/cmTC_9ddfa.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_9ddfa
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9ddfa.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=kvm_open    CMakeFiles/cmTC_9ddfa.dir/CheckFunctionExists.c.o  -o cmTC_9ddfa  -L/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/kvm.h -Wl,-rpath,/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/kvm.h -lkvm 
+/usr/bin/ld: cannot find -lkvm
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_9ddfa.dir/build.make:97: recipe for target 'cmTC_9ddfa' failed
+make[1]: *** [cmTC_9ddfa] Error 1
+make[1]: Leaving directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_9ddfa/fast' failed
+make: *** [cmTC_9ddfa/fast] Error 2
+
+
+Determining if the function perfstat_cpu exists in the perfstat failed with the following output:
+Change Dir: /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_bd8b7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_bd8b7.dir/build.make CMakeFiles/cmTC_bd8b7.dir/build
+make[1]: Entering directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bd8b7.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=perfstat_cpu   -std=gnu11 -o CMakeFiles/cmTC_bd8b7.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_bd8b7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bd8b7.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=perfstat_cpu    CMakeFiles/cmTC_bd8b7.dir/CheckFunctionExists.c.o  -o cmTC_bd8b7  -L/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/libperfstat.h -Wl,-rpath,/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/libperfstat.h -lperfstat 
+/usr/bin/ld: cannot find -lperfstat
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_bd8b7.dir/build.make:97: recipe for target 'cmTC_bd8b7' failed
+make[1]: *** [cmTC_bd8b7] Error 1
+make[1]: Leaving directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_bd8b7/fast' failed
+make: *** [cmTC_bd8b7/fast] Error 2
+
+
+Determining if the function sendfile exists in the sendfile failed with the following output:
+Change Dir: /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4bd12/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4bd12.dir/build.make CMakeFiles/cmTC_4bd12.dir/build
+make[1]: Entering directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4bd12.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sendfile   -std=gnu11 -o CMakeFiles/cmTC_4bd12.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_4bd12
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4bd12.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sendfile    CMakeFiles/cmTC_4bd12.dir/CheckFunctionExists.c.o  -o cmTC_4bd12 -lsendfile 
+/usr/bin/ld: cannot find -lsendfile
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_4bd12.dir/build.make:97: recipe for target 'cmTC_4bd12' failed
+make[1]: *** [cmTC_4bd12] Error 1
+make[1]: Leaving directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_4bd12/fast' failed
+make: *** [cmTC_4bd12/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_29b62/fast"
+/usr/bin/make -f CMakeFiles/cmTC_29b62.dir/build.make CMakeFiles/cmTC_29b62.dir/build
+make[1]: Entering directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_29b62.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_29b62.dir/CheckSymbolExists.c.o   -c /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_29b62
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_29b62.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_29b62.dir/CheckSymbolExists.c.o  -o cmTC_29b62 
+CMakeFiles/cmTC_29b62.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_29b62.dir/build.make:97: recipe for target 'cmTC_29b62' failed
+make[1]: *** [cmTC_29b62] Error 1
+make[1]: Leaving directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_29b62/fast' failed
+make: *** [cmTC_29b62/fast] Error 2
+
+File /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_50311/fast"
+/usr/bin/make -f CMakeFiles/cmTC_50311.dir/build.make CMakeFiles/cmTC_50311.dir/build
+make[1]: Entering directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_50311.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_50311.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_50311
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_50311.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_50311.dir/CheckFunctionExists.c.o  -o cmTC_50311 -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_50311.dir/build.make:97: recipe for target 'cmTC_50311' failed
+make[1]: *** [cmTC_50311] Error 1
+make[1]: Leaving directory '/Basil_with_ReTx/src/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_50311/fast' failed
+make: *** [cmTC_50311/fast] Error 2
+
+
