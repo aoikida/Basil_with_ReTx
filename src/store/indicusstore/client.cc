@@ -491,6 +491,8 @@ void Client::Phase1TimeoutCallback(int group, uint64_t txnId, int status) {
     return;
   }
 
+  return;
+
   Warning("PHASE1[%lu:%lu] group %d timed out.", client_id, txnId, group);
 
   req->outstandingPhase1s = 0;
@@ -706,6 +708,9 @@ void Client::Phase2TimeoutCallback(int group, uint64_t txnId, int status) {
   }
 
   Warning("PHASE2[%lu:%lu] group %d timed out.", client_id, txnId, group);
+
+  return;
+
   Panic("P2 timing out for txnId: %lu; honest client: %s", txnId, failureActive ? "False" : "True");
 
   Phase2(req);
