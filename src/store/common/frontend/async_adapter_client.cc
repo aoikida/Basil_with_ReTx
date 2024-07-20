@@ -80,7 +80,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
     for (auto op = retry_tx.begin(); op != retry_tx.end(); ++op){
       switch (op->type) {
         case GET: {
-          pre_read_set.push_back(*op);
           for (auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
             if ((*itr).key == op->key){
               duplicate = true;
@@ -105,10 +104,10 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
             break;
           }
+          pre_read_set.push_back(*op);
           break;
         }
         case PUT: {
-          pre_write_set.push_back(*op);
           for (auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
             if ((*itr).key == op->key){
               duplicate = true;
@@ -133,6 +132,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
             break;
           }
+          pre_write_set.push_back(*op);
           break;
         }
       }
@@ -175,7 +175,6 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
       switch (op.type) {
         case GET: {
           retry_tx.push_back(op);
-          pre_read_set.push_back(op);
           for (auto itr = pre_read_set.begin(); itr != pre_read_set.end(); ++itr){
             if ((*itr).key == op.key){
               duplicate = true;
@@ -207,11 +206,11 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
             break;
           }
+          pre_read_set.push_back(op);
           break;
         }
         case PUT: {
           retry_tx.push_back(op);
-          pre_write_set.push_back(op);
           for (auto itr = pre_write_set.begin(); itr != pre_write_set.end(); ++itr){
             if ((*itr).key == op.key){
               duplicate = true;
@@ -243,6 +242,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
             }
             break;
           }
+          pre_write_set.push_back(op);
           break;
         }
       }
