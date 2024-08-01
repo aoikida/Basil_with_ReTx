@@ -128,8 +128,7 @@ class Client : public ::Client {
     }
 
     Client *client;
-    commit_callback cc;
-    commit_callback_batch ccb;
+    commit_callback ccb;
     commit_timeout_callback ctcb;
     uint64_t id;
     int outstandingPhase1s;

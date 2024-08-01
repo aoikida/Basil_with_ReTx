@@ -89,12 +89,9 @@ Server::Server(const transport::Configuration &config, int groupIdx, int idx,
   Debug("Starting Indicus replica %d.", id);
   //ソケットを作成している
   //ここでacceptcallbackを経由して、readablecallbackを呼び出している。
-  if (params.batchOptimization){
-    transport->Register_batch(this, config, groupIdx, idx);
-  }
-  else{
-    transport->Register(this, config, groupIdx, idx);
-  }
+  
+  transport->Register(this, config, groupIdx, idx);
+  
   
   _Latency_Init(&committedReadInsertLat, "committed_read_insert_lat");
   _Latency_Init(&verifyLat, "verify_lat");
@@ -5139,29 +5136,14 @@ void Server::SendPhase1FBReply(P1FBorganizer *p1fb_organizer, const std::string 
       Debug("All message components of Phase1FBreply signed. Sending.");
       p1fb_organizer->sendCBmutex.unlock();
       if(!multi){
-          if (!params.batchOptimization){
-            transport->SendMessage(this, *p1fb_organizer->remote, *p1fb_organizer->p1fbr);
-          }
-          else{
-            std::vector<Message *> phase1Replies;
-            phase1Replies.push_back(p1fb_organizer->p1fbr);
-            transport->SendMessage_batch(this, *p1fb_organizer->remote, phase1Replies);
-          }
-          
+        transport->SendMessage(this, *p1fb_organizer->remote, *p1fb_organizer->p1fbr);
       }
       else{
         interestedClientsMap::const_accessor i;
         bool has_interested = interestedClients.find(i, p1fb_organizer->p1fbr->txn_digest());
         if(has_interested){
           for (const auto addr : i->second) {
-            if (!params.batchOptimization){
-              transport->SendMessage(this, *p1fb_organizer->remote, *p1fb_organizer->p1fbr);
-            }
-            else{
-              std::vector<Message *> phase1Replies;
-              phase1Replies.push_back(p1fb_organizer->p1fbr);
-              transport->SendMessage_batch(this, *p1fb_organizer->remote, phase1Replies);
-            }
+            transport->SendMessage(this, *p1fb_organizer->remote, *p1fb_organizer->p1fbr);
           }
         }
         i.release();

@@ -290,12 +290,12 @@ void Client::Put(const std::string &key, const std::string &value,
   
 }
 
-void Client::Commit(commit_callback cc, commit_timeout_callback ctcb,
+void Client::Commit(commit_callback ccb, commit_timeout_callback ctcb,
     uint32_t timeout) {
   
   Debug("Client::Commit is called");
       
-  transport->Timer(0, [this, cc, ctcb, timeout]() {
+  transport->Timer(0, [this, ccb, ctcb, timeout]() {
     //uint64_t ns = Latency_End(&executeLatency);
 
     //Latency_Start(&commitLatency);
@@ -307,7 +307,7 @@ void Client::Commit(commit_callback cc, commit_timeout_callback ctcb,
     PendingRequest *req = new PendingRequest(client_seq_num, this);
     pendingReqs[client_seq_num] = req;
     req->txn = txn; //Is this a copy or just reference?
-    req->cc = cc;
+    req->ccb = ccb;
     req->ctcb = ctcb;
     req->callbackInvoked = false;
     req->txnDigest = TransactionDigest(txn, params.hashDigest);
@@ -484,16 +484,14 @@ void Client::Phase1TimeoutCallback(int group, uint64_t txnId, int status) {
     return;
   }
 
-  Warning("P1 TIMEOUT IS TRIGGERED for tx_id %d on group %d", txnId, group);
-
   PendingRequest *req = itr->second;
   if (req->startedPhase2 || req->startedWriteback) {
     return;
   }
 
-  return;
-
   Warning("PHASE1[%lu:%lu] group %d timed out.", client_id, txnId, group);
+
+  return;
 
   req->outstandingPhase1s = 0;
   if (params.validateProofs && params.signedMessages) {
@@ -674,8 +672,6 @@ void Client::Phase2Callback(uint64_t txnId, int group, proto::CommitDecision dec
     return;
   }
 
-  Debug("PHASE2[%lu:%lu] callback", client_id, txnId);
-
   PendingRequest *req = itr->second;
 
   if (req->startedWriteback) {
@@ -683,6 +679,8 @@ void Client::Phase2Callback(uint64_t txnId, int group, proto::CommitDecision dec
         txnId);
     return;
   }
+
+  Debug("PHASE2[%lu:%lu] callback", client_id, txnId);
 
   if (params.validateProofs && params.signedMessages) {
     (*req->p2ReplySigsGrouped.mutable_grouped_sigs())[group] = p2ReplySigs;
@@ -809,7 +807,7 @@ void Client::Writeback(PendingRequest *req) {
       //result = ABORTED_USER;
     }
 
-    req->cc(result);
+    req->ccb(result);
     
     req->callbackInvoked = true;
   }
@@ -878,12 +876,8 @@ void Client::FailureCleanUp(PendingRequest *req) {
   }
   if (!req->callbackInvoked) {
     //uint64_t ns = Latency_End(&commitLatency);
-    if (params.batchOptimization){
-      req->ccb(result, req->id);
-    }
-    else {
-      req->cc(result);
-    }
+    req->ccb(result);
+    
     req->callbackInvoked = true;
   }
   this->pendingReqs.erase(req->id);
@@ -951,12 +945,8 @@ void Client::ForwardWBcallback(uint64_t txnId, int group, proto::ForwardWritebac
 
   if (!req->callbackInvoked) {
     //uint64_t ns = Latency_End(&commitLatency);
-    if (params.batchOptimization){
-      req->ccb(result, req->id);
-    }
-    else {
-      req->cc(result);
-    }
+    req->ccb(result);
+
     req->callbackInvoked = true;
   }
 
@@ -1186,13 +1176,8 @@ void Client::SendPhase1FB(uint64_t conflict_id, const std::string &txnDigest, Pe
       auto wb = std::bind(&Client::WritebackFBcallback, this, conflict_id, txnDigest, std::placeholders::_1);
       auto invoke = std::bind(&Client::InvokeFBcallback, this, conflict_id, txnDigest, group); //technically only needed at logging shard
 
-      if (!params.batchOptimization){
-        //bclient[group]->Phase1FB(p1->req_id(), pendingFB->txn, txnDigest, p1Relay, p1fbA, p1fbB, p2fb, wb, invoke);
-        bclient[group]->Phase1FB(client_id, pendingFB->txn, txnDigest, p1Relay, p1fbA, p1fbB, p2fb, wb, invoke, pendingFB->logGrp);
-      }
-      else{
-         bclient[group]->Phase1FB_batch(client_id, pendingFB->txn, txnDigest, p1Relay, p1fbA, p1fbB, p2fb, wb, invoke, pendingFB->logGrp);
-      }
+      bclient[group]->Phase1FB(client_id, pendingFB->txn, txnDigest, p1Relay, p1fbA, p1fbB, p2fb, wb, invoke, pendingFB->logGrp);
+  
       pendingFB->outstandingPhase1s++;
     }
   Debug("Sent all Phase1FB for txn[%s]", BytesToHex(txnDigest, 64).c_str());

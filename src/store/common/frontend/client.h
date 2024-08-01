@@ -47,8 +47,6 @@ typedef std::function<void(int, const std::string &,
 
 typedef std::function<void(transaction_status_t)> commit_callback;
 
-typedef std::function<void(transaction_status_t, int)> commit_callback_batch;
-
 typedef std::function<void()> commit_timeout_callback;
 
 typedef std::function<void()> abort_callback;

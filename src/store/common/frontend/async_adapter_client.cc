@@ -75,6 +75,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
 
   Debug("ReconstructTransaction: txNum: %d, txSize: %d, batchSize: %d\n", txNum, txSize, batchSize);
 
+
   //前回のバッチに入れなかったトランザクションを再度バッチに入れる
   if (retry_tx.size() != 0) {
     for (auto op = retry_tx.begin(); op != retry_tx.end(); ++op){
@@ -272,6 +273,7 @@ void AsyncAdapterClient::ReconstructTransaction(uint64_t txNum, uint64_t txSize,
     }
   }
 
+  //basic
   if (writeOpNum == 0){
     ExecuteReadOperation();
   }
